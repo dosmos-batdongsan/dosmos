@@ -1,0 +1,2816 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Domos — Quản lý Phòng Trọ</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F0F4F8;
+  --surface:#FFFFFF;
+  --surface2:#F7F9FC;
+  --sidebar:#0F172A;
+  --sidebar2:#1E293B;
+  --accent:#1D4ED8;
+  --accent-mid:#3B82F6;
+  --accent-soft:#EFF6FF;
+  --accent-border:#BFDBFE;
+  --text:#0D1B2A;
+  --text2:#3D5166;
+  --muted:#7B93B0;
+  --border:#DDE4EE;
+  --border2:#E8EEF5;
+  --up:#059669;--up-soft:#ECFDF5;--up-border:#6EE7B7;
+  --down:#DC2626;--down-soft:#FEF2F2;--down-border:#FECACA;
+  --warn:#D97706;--warn-soft:#FFFBEB;--warn-border:#FDE68A;
+  --empty:#7C3AED;--empty-soft:#F5F3FF;--empty-border:#DDD6FE;
+  --header-gradient:linear-gradient(135deg,#0E2A6E 0%,#1D4ED8 60%,#1e40af 100%);
+  --r:10px;--r-lg:14px;--r-xl:18px;--r-2xl:22px;
+  --shadow-xs:0 1px 3px rgba(13,27,42,.06),0 1px 2px rgba(13,27,42,.04);
+  --shadow:0 2px 12px rgba(13,27,42,.08),0 4px 20px rgba(13,27,42,.04);
+  --shadow-md:0 4px 20px rgba(13,27,42,.10),0 8px 32px rgba(13,27,42,.05);
+  --shadow-lg:0 8px 36px rgba(13,27,42,.12),0 16px 48px rgba(13,27,42,.07);
+  /* ── MOTION SYSTEM (đồng bộ toàn bộ hiệu ứng) ── */
+  --ease-out:cubic-bezier(.22,1,.36,1);   /* easing chữ ký: mọi hiệu ứng vào/ra */
+  --ease-std:cubic-bezier(.4,0,.2,1);     /* easing cho thanh tiến độ/fill */
+  --t-micro:.318s;  /* hover nút, icon, input, chip, tab (+20% nữa, tổng +44% so gốc) */
+  --t-base:.432s;   /* hover card, fade thường (+20% nữa, tổng +44% so gốc) */
+  --t-fade:.462s;   /* fade overlay/backdrop (+20% nữa, tổng +44% so gốc) */
+  --t-panel:.576s;  /* modal-box, room-detail-panel — transform (+20% nữa, tổng +44% so gốc) */
+  --t-slide:.432s;  /* sidebar mobile trượt (+20% nữa, tổng +44% so gốc) */
+  --t-bar:.936s;    /* thanh tiến độ thu tiền/điện (+20% nữa, tổng +44% so gốc) */
+  --t-collapse:.462s;/* note-toggle thu gọn/mở rộng (+20% nữa, tổng +44% so gốc) */
+}
+html{scrollbar-gutter:stable}
+body{font-family:'Quicksand',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;font-weight:600;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh;align-items:flex-start}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--sidebar);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:300;
+  overflow-y:auto;overflow-x:hidden;
+}
+.sidebar-logo{
+  padding:1.4rem 1.2rem 1rem;
+  display:flex;align-items:center;gap:11px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.logo-mark{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent-mid),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(29,78,216,.4);flex-shrink:0;
+}
+.logo-mark i{font-size:20px;color:#fff}
+.logo-text{color:#fff;font-weight:700;font-size:15px;line-height:1.2}
+.logo-text small{display:block;font-size:10px;opacity:.4;letter-spacing:1.2px;font-weight:600;margin-top:1px}
+
+.sidebar-section{padding:.75rem .75rem .25rem;font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:rgba(255,255,255,.28)}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:10px 14px;border:none;background:none;
+  color:rgba(255,255,255,.5);font-family:'Quicksand',sans-serif;font-size:13.5px;font-weight:700;
+  cursor:pointer;border-radius:9px;margin:1px 6px;width:calc(100% - 12px);
+  transition:background var(--t-micro),color var(--t-micro);text-align:left;
+}
+.nav-btn i{font-size:19px;flex-shrink:0;transition:color var(--t-micro)}
+.nav-btn:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.nav-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(29,78,216,.35)}
+.nav-btn.active i{color:#fff}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
+.nav-btn.active .nav-badge{background:rgba(255,255,255,.2);color:#fff}
+
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid rgba(255,255,255,.07)}
+.user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:background var(--t-micro)}
+.user-row:hover{background:rgba(255,255,255,.07)}
+.avatar{width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:700;color:rgba(255,255,255,.8)}
+.user-sub{font-size:11px;color:rgba(255,255,255,.35);font-weight:600}
+
+/* ── MAIN ── */
+.main{margin-left:240px;flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh}
+#backup-banner{transition:opacity var(--t-fade) var(--ease-out),max-height var(--t-fade) var(--ease-out);opacity:1;max-height:0;overflow:hidden;will-change:opacity,max-height}
+#backup-banner.banner-hide{opacity:0;padding-top:0 !important;padding-bottom:0 !important;border-bottom-width:0 !important}
+#sidebar-overlay{display:none}
+
+@media (max-width: 860px){
+  .sidebar{transform:translateX(-100%);transition:transform var(--t-slide) var(--ease-out);z-index:400;will-change:transform}
+  .sidebar.open{transform:translateX(0);box-shadow:var(--shadow-lg)}
+  .main{margin-left:0}
+  #sidebar-toggle-btn{display:flex !important}
+  #sidebar-overlay.open{
+    display:block;position:fixed;inset:0;background:rgba(13,27,42,.45);z-index:399;
+    opacity:0;transition:opacity var(--t-fade) var(--ease-out);will-change:opacity;
+  }
+  #sidebar-overlay.open.show{opacity:1}
+}
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 1.75rem;height:60px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:150;box-shadow:var(--shadow-xs);flex-shrink:0;
+}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.page-title{font-size:17px;font-weight:700;color:var(--text)}
+.page-sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:36px;height:36px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  transition:background var(--t-micro),border-color var(--t-micro),transform var(--t-micro);position:relative;
+}
+.icon-btn:hover{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent);transform:translateY(-1px)}
+.icon-btn:active{transform:translateY(0) scale(.93)}
+.notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--down);border:1.5px solid var(--surface)}
+
+.content{flex:1;padding:1.75rem 2rem 3rem;width:100%;box-sizing:border-box}
+
+/* ── PAGE SECTIONS ── */
+.section{display:none}
+.section.active{display:block;animation:fadeUp var(--t-panel) var(--ease-out) both}
+/* fade-swap — dùng cho nội dung thay thế tức thì sau khi click/đổi tháng/đổi tab, không phải cả section */
+.fade-swap{animation:fadeUp var(--t-base) var(--ease-out) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── METRICS ROW ── */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px;margin-bottom:1.5rem}
+.metric{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:4px;min-width:0;
+  box-shadow:var(--shadow-xs);transition:box-shadow var(--t-base),transform var(--t-base);
+}
+.metric:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.alert-item{transition:box-shadow var(--t-micro) ease,transform var(--t-micro) ease}
+.alert-item:hover{box-shadow:var(--shadow-xs);transform:translateY(-1px)}
+.metric-icon{font-size:26px;margin-bottom:4px}
+.metric-val{font-size:1.75rem;font-weight:700;color:var(--text);line-height:1.1}
+.metric-label{font-size:11.5px;color:var(--muted);font-weight:600}
+.metric.up .metric-icon{color:var(--up)}.metric.up .metric-val{color:var(--up)}
+.metric.down .metric-icon{color:var(--down)}.metric.down .metric-val{color:var(--down)}
+.metric.warn .metric-icon{color:var(--warn)}.metric.warn .metric-val{color:var(--warn)}
+.metric.accent .metric-icon{color:var(--accent)}.metric.accent .metric-val{color:var(--accent)}
+
+/* ── CARDS GRID ── */
+.houses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:16px}
+.houses-grid>.house-card{animation:fadeUp var(--t-base) var(--ease-out) both}
+.houses-grid>.house-card:nth-child(1){animation-delay:.02s}
+.houses-grid>.house-card:nth-child(2){animation-delay:.05s}
+.houses-grid>.house-card:nth-child(3){animation-delay:.08s}
+.houses-grid>.house-card:nth-child(4){animation-delay:.11s}
+.houses-grid>.house-card:nth-child(5){animation-delay:.14s}
+.houses-grid>.house-card:nth-child(6){animation-delay:.17s}
+.houses-grid>.house-card:nth-child(n+7){animation-delay:.2s}
+.house-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);
+  overflow:hidden;box-shadow:var(--shadow-xs);cursor:pointer;
+  transition:box-shadow var(--t-base),transform var(--t-base),border-color var(--t-base);display:flex;flex-direction:column;
+}
+.house-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);border-color:var(--accent-border)}
+.house-card:active{transform:translateY(-1px) scale(.99)}
+.house-card-header{
+  padding:1.1rem 1.2rem .9rem;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+  border-bottom:1px solid var(--border2);
+}
+.house-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--accent-soft);border:1.5px solid var(--accent-border);
+  display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--accent);flex-shrink:0;
+}
+.house-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.2}
+.house-addr{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:4px}
+
+/* Thu tiền progress bar — signature element */
+.collect-bar-wrap{padding:1rem 1.2rem .85rem}
+.collect-bar-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.collect-bar-label span{font-size:12px;font-weight:700;color:var(--text2)}
+.collect-bar-label strong{font-size:13px;font-weight:700}
+.collect-bar-track{height:8px;background:var(--border2);border-radius:5px;overflow:hidden;position:relative}
+.collect-bar-fill{height:100%;border-radius:5px;transition:width var(--t-bar) var(--ease-std)}
+
+.house-card-footer{
+  padding:.75rem 1.2rem;background:var(--surface2);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  border-top:1px solid var(--border2);flex-wrap:wrap;
+}
+.house-stat{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text2)}
+.house-stat i{font-size:15px;color:var(--muted)}
+.btn-enter{
+  display:flex;align-items:center;gap:5px;padding:6px 13px;
+  background:var(--accent);color:#fff;border:none;border-radius:8px;
+  font-family:'Quicksand',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;
+  transition:background var(--t-micro),transform var(--t-micro),box-shadow var(--t-micro);
+}
+.btn-enter:hover{background:#1e40af;transform:translateY(-1px);box-shadow:0 4px 12px rgba(29,78,216,.3)}
+.btn-enter:active{transform:scale(.96)}
+.btn-enter i{font-size:14px}
+
+/* ── BADGE ── */
+.badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;transition:background var(--t-micro),color var(--t-micro),border-color var(--t-micro)}
+.badge-up{background:var(--up-soft);color:var(--up);border:1px solid var(--up-border)}
+.badge-down{background:var(--down-soft);color:var(--down);border:1px solid var(--down-border)}
+.badge-warn{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn-border)}
+.badge-accent{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border)}
+.badge-neutral{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.badge-empty{background:var(--empty-soft);color:var(--empty);border:1px solid var(--empty-border)}
+
+/* ── FILTER CHIP ── */
+.filter-chip{
+  display:inline-flex;align-items:center;gap:5px;padding:6.5px 14px;border-radius:999px;
+  font-size:12.5px;font-weight:700;font-family:'Quicksand',sans-serif;cursor:pointer;user-select:none;
+  border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);
+  transition:background var(--t-micro) ease,color var(--t-micro) ease,border-color var(--t-micro) ease,box-shadow var(--t-micro) ease,transform var(--t-micro) ease;
+}
+.filter-chip:hover{transform:translateY(-1px);border-color:var(--border2)}
+.filter-chip:active{transform:translateY(0) scale(.95)}
+.filter-chip[data-color="accent"]{color:var(--accent)}
+.filter-chip[data-color="warn"]{color:var(--warn)}
+.filter-chip[data-color="down"]{color:var(--down)}
+.filter-chip[data-color="empty"]{color:var(--empty)}
+.filter-chip.active.c-accent{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border);box-shadow:0 2px 8px rgba(29,78,216,.12)}
+.filter-chip.active.c-warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-border);box-shadow:0 2px 8px rgba(251,191,36,.15)}
+.filter-chip.active.c-down{background:var(--down-soft);color:var(--down);border-color:var(--down-border);box-shadow:0 2px 8px rgba(248,113,113,.15)}
+.filter-chip.active.c-empty{background:var(--empty-soft);color:var(--empty);border-color:var(--empty-border);box-shadow:0 2px 8px rgba(124,58,237,.15)}
+.filter-chip .chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.8}
+
+/* ── HOUSE DETAIL VIEW ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 14px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--text2);font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;margin-bottom:1.2rem;transition:background var(--t-micro),border-color var(--t-micro),color var(--t-micro);
+}
+.back-btn:hover{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent)}
+.back-btn i{font-size:16px}
+
+.house-detail-header{
+  background:var(--header-gradient);
+  border-radius:var(--r-xl);padding:1.6rem 1.8rem;margin-bottom:1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;
+  box-shadow:var(--shadow-lg);
+}
+.hdh-left{min-width:0;flex:1}
+.hdh-name{font-size:1.5rem;font-weight:700;color:#fff;line-height:1.2}
+.hdh-addr{font-size:13px;color:rgba(255,255,255,.65);margin-top:3px;display:flex;align-items:center;gap:5px;font-weight:600}
+.hdh-stats{display:flex;gap:.75rem;margin-top:.9rem;flex-wrap:wrap;min-width:0}
+.hdh-stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:8px 14px}
+.hdh-stat-val{font-size:1.1rem;font-weight:700;color:#fff}
+.hdh-stat-label{font-size:10.5px;color:rgba(255,255,255,.55);font-weight:600;margin-top:1px}
+.hdh-right{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── ROOMS GRID ── */
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr));gap:14px}
+.rooms-grid>.room-card{animation:fadeUp var(--t-base) var(--ease-out) both}
+.rooms-grid>.room-card:nth-child(1){animation-delay:.02s}
+.rooms-grid>.room-card:nth-child(2){animation-delay:.045s}
+.rooms-grid>.room-card:nth-child(3){animation-delay:.07s}
+.rooms-grid>.room-card:nth-child(4){animation-delay:.095s}
+.rooms-grid>.room-card:nth-child(5){animation-delay:.12s}
+.rooms-grid>.room-card:nth-child(6){animation-delay:.145s}
+.rooms-grid>.room-card:nth-child(7){animation-delay:.17s}
+.rooms-grid>.room-card:nth-child(8){animation-delay:.195s}
+.rooms-grid>.room-card:nth-child(n+9){animation-delay:.22s}
+.room-card{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);
+  overflow:hidden;box-shadow:var(--shadow-xs);cursor:pointer;
+  transition:box-shadow var(--t-base),transform var(--t-base),border-color var(--t-base);
+}
+.room-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.room-card:active{transform:translateY(0) scale(.98)}
+.room-card.status-collected{border-color:var(--up-border)}
+.room-card.status-overdue{border-color:var(--down-border)}
+.room-card.status-pending{border-color:var(--warn-border)}
+.room-card.status-empty{border-color:var(--empty-border);opacity:.8}
+
+.room-card-top{
+  padding:.9rem 1rem .75rem;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+}
+.room-number{font-size:16px;font-weight:700;color:var(--text)}
+.room-tenant{font-size:12.5px;color:var(--text2);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:4px}
+.room-tenant i{font-size:14px;color:var(--muted)}
+
+.room-bill{
+  padding:.6rem 1rem .85rem;
+  border-top:1px solid var(--border2);background:var(--surface2);
+}
+.bill-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12.5px}
+.bill-row .label{color:var(--text2);display:flex;align-items:center;gap:5px}
+.bill-row .label i{font-size:13px;color:var(--muted)}
+.bill-row .val{font-weight:700;color:var(--text)}
+.bill-total{display:flex;justify-content:space-between;align-items:center;padding:7px 0 0;margin-top:4px;border-top:1px dashed var(--border);font-size:13.5px}
+.bill-total .label{font-weight:700;color:var(--text)}
+.bill-total .val{font-weight:700;color:var(--accent);font-size:14px}
+
+.room-card-footer{
+  padding:.6rem 1rem;display:flex;gap:6px;border-top:1px solid var(--border2);flex-wrap:wrap;
+}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 15px;
+  border:1.5px solid transparent;border-radius:var(--r);
+  font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:background var(--t-micro),border-color var(--t-micro),color var(--t-micro),transform var(--t-micro),box-shadow var(--t-micro);white-space:nowrap;
+}
+.btn i{font-size:16px}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.96)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(29,78,216,.2)}
+.btn-primary:hover{background:#1e40af;box-shadow:0 4px 14px rgba(29,78,216,.3)}
+.btn-outline{background:var(--surface);color:var(--text2);border-color:var(--border)}
+.btn-outline:hover{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent)}
+.btn-ghost{background:none;color:var(--text2);border-color:transparent;padding:6px 10px}
+.btn-ghost:hover{background:var(--accent-soft);color:var(--accent)}
+.btn-danger{background:var(--down-soft);color:var(--down);border-color:var(--down-border)}
+.btn-danger:hover{background:var(--down);color:#fff}
+.btn-up{background:var(--up-soft);color:var(--up);border-color:var(--up-border)}
+.btn-up:hover{background:var(--up);color:#fff}
+.btn-warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-border)}
+.btn-warn:hover{background:var(--warn);color:#fff}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-sm i{font-size:14px}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-xs);min-width:0}
+.card-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;min-width:0}
+.card-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+.card-title i{font-size:18px;color:var(--accent)}
+.card-body{padding:1.1rem 1.2rem}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;min-width:0;width:100%}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:auto}
+thead th{background:var(--surface2);padding:9px 12px;text-align:left;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--accent-soft)}
+tfoot td{padding:11px 12px;border-top:2px solid var(--accent-border);vertical-align:middle;font-weight:700;background:var(--accent-soft) !important;color:var(--text)}
+tfoot tr:hover td{background:var(--accent-soft) !important}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(13,27,42,.5);backdrop-filter:blur(4px);
+  z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;
+  opacity:0;transition:opacity var(--t-fade) var(--ease-out);will-change:opacity;
+}
+.modal-overlay.open{display:flex}
+.modal-overlay.show{opacity:1}
+.modal-box{
+  background:var(--surface);border-radius:var(--r-2xl);box-shadow:var(--shadow-lg);
+  border:1px solid var(--border);width:100%;max-width:560px;max-height:90vh;
+  overflow:hidden;transform:translateY(20px) scale(.97);opacity:0;
+  transition:transform var(--t-panel) var(--ease-out),opacity var(--t-fade) var(--ease-out);
+  display:flex;flex-direction:column;will-change:transform,opacity;
+}
+.modal-box.large{max-width:900px}
+.modal-overlay.show .modal-box{transform:none;opacity:1}
+.modal-scroll{overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.modal-scroll::-webkit-scrollbar{width:5px}.modal-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.modal-header{
+  padding:1.2rem 1.4rem 1rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--surface);z-index:2;flex-shrink:0;
+}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.modal-title i{font-size:20px;color:var(--accent)}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);transition:background var(--t-micro),color var(--t-micro)}
+.modal-close:hover{background:var(--down-soft);color:var(--down);border-color:var(--down-border)}
+.modal-body{padding:1.2rem 1.4rem}
+.modal-footer{padding:.9rem 1.4rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:var(--surface2);flex-wrap:wrap;flex-shrink:0}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:12px;font-weight:700;color:var(--text2)}
+.fg input,.fg select,.fg textarea{
+  padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r);
+  font-family:'Quicksand',sans-serif;font-size:13px;font-weight:600;color:var(--text);
+  background:var(--surface2);outline:none;transition:border-color var(--t-micro),box-shadow var(--t-micro);width:100%;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,78,216,.1)}
+.fg textarea{resize:vertical;min-height:70px}
+.fg .hint{font-size:11px;color:var(--muted);font-weight:600}
+.table-input{
+  padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);
+  font-family:'Quicksand',sans-serif;font-size:13px;font-weight:600;color:var(--text);
+  background:var(--surface2);outline:none;transition:border-color var(--t-micro),box-shadow var(--t-micro);width:100%;
+}
+.table-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,78,216,.1)}
+
+/* ── BULK ELECTRIC ROW LIST (responsive, no horizontal scroll needed) ── */
+.be-row{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
+.be-row:last-child{border-bottom:none}
+.be-room{flex:1 1 130px;min-width:110px}
+.be-room strong{display:block;font-size:13.5px;color:var(--text)}
+.be-room span{display:block;font-size:11.5px;color:var(--text2);font-weight:600}
+.be-prev{flex:0 0 auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.be-prev b{color:var(--text2);font-weight:700}
+.be-input-wrap{flex:1 1 110px;min-width:100px}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:3rem 1rem;animation:fadeUp var(--t-base) var(--ease-out) both}
+.empty i{font-size:48px;color:var(--border);display:block;margin-bottom:1rem}
+.empty h3{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty p{font-size:13px;color:var(--muted)}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{
+  background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--r);
+  font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;
+  box-shadow:var(--shadow-lg);min-width:220px;
+  animation:toastIn var(--t-panel) var(--ease-out) both;pointer-events:auto;will-change:transform,opacity;
+}
+.toast.out{animation:toastOut var(--t-fade) var(--ease-out) forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(20px)}}
+.r-fee-row{animation:fadeUp var(--t-micro) var(--ease-out) both}
+.r-fee-row.removing{animation:rowOut var(--t-micro) var(--ease-out) forwards;pointer-events:none}
+@keyframes rowOut{to{opacity:0;transform:translateX(6px) scale(.95)}}
+.toast i{font-size:17px}
+
+/* ── INFO BOX ── */
+.info-box{background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--r);padding:.85rem 1rem;display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--accent);font-weight:600;margin-top:1rem;line-height:1.8}
+.info-box i{font-size:17px;flex-shrink:0;margin-top:2px}
+
+/* ── NOTE BLOCK — chú thích tham khảo tĩnh (khác info-box: trung tính, gộp chung, không phải cảnh báo cần đọc ngay) ── */
+.note-block{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-lg);margin-top:1rem;overflow:hidden}
+.note-row{display:flex;align-items:flex-start;gap:9px;padding:.7rem 1rem;font-size:12px;color:var(--text2);font-weight:600;line-height:1.7;border-bottom:1px solid var(--border2)}
+.note-row:last-child{border-bottom:none}
+.note-row i{font-size:15px;color:var(--muted);flex-shrink:0;margin-top:2px}
+.note-toggle{display:flex;align-items:center;gap:8px;padding:.7rem 1rem;cursor:pointer;user-select:none;font-size:12.5px;font-weight:700;color:var(--text2);transition:background var(--t-micro)}
+.note-toggle:hover{background:var(--accent-soft);color:var(--accent)}
+.note-toggle i.ti-info-circle{font-size:16px;color:var(--accent)}
+.note-toggle .note-chevron{margin-left:auto;font-size:16px;color:var(--muted);transition:transform var(--t-collapse) var(--ease-out)}
+.note-block.open .note-toggle .note-chevron{transform:rotate(180deg)}
+.note-block.open .note-toggle{border-bottom:1px solid var(--border2)}
+.note-body{max-height:0;overflow:hidden;transition:max-height var(--t-collapse) var(--ease-out)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:1.1rem;flex-wrap:wrap}
+.tab-btn{padding:8px 13px;font-size:12.5px;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:var(--t-micro);font-family:'Quicksand',sans-serif;display:flex;align-items:center;gap:5px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-color:var(--accent)}
+
+/* ── SECTION HEADER ── */
+.sec-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.sec-title{font-size:16px;font-weight:700;color:var(--text)}
+.sec-sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+
+/* ── ROOM DETAIL MODAL (full-center) ── */
+.room-detail-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:600;
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+  background:rgba(13,27,42,.55);backdrop-filter:blur(6px);
+  opacity:0;transition:opacity var(--t-fade) var(--ease-out);will-change:opacity;
+}
+.room-detail-overlay.open{display:flex}
+.room-detail-overlay.show{opacity:1}
+.room-detail-backdrop{position:absolute;inset:0}
+.room-detail-panel{
+  position:relative;z-index:1;
+  width:100%;max-width:860px;max-height:92vh;
+  background:var(--surface);border-radius:var(--r-2xl);
+  box-shadow:var(--shadow-lg);border:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transform:translateY(18px) scale(.97);opacity:0;
+  transition:transform var(--t-panel) var(--ease-out),opacity var(--t-fade) var(--ease-out);will-change:transform,opacity;
+}
+.room-detail-overlay.show .room-detail-panel{transform:none;opacity:1}
+.rdp-header{
+  padding:1.3rem 1.6rem;border-radius:var(--r-2xl) var(--r-2xl) 0 0;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  background:var(--header-gradient);
+  flex-shrink:0;
+}
+.rdp-header-left{display:flex;align-items:center;gap:14px}
+.rdp-header-icon{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0}
+.rdp-room{font-size:19px;font-weight:700;color:#fff;line-height:1.2}
+.rdp-tenant{font-size:13px;color:rgba(255,255,255,.7);margin-top:2px;font-weight:600;display:flex;align-items:center;gap:5px}
+.rdp-scroll{flex:1;overflow-y:auto;padding:1.5rem 1.6rem 1.5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));grid-auto-rows:min-content;gap:1rem;align-content:start}
+.rdp-scroll::-webkit-scrollbar{width:5px}
+.rdp-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.rdp-col-full{grid-column:1/-1}
+
+
+/* bill breakdown trong panel */
+.bill-breakdown{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;min-width:0}
+.bb-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border2);font-size:13px}
+.bb-row:last-child{border-bottom:none}
+.bb-row .lbl{display:flex;align-items:center;gap:6px;color:var(--text2);font-weight:600;min-width:0;flex:1;font-size:12.5px;line-height:1.4}
+.bb-row .lbl i{font-size:16px;color:var(--muted)}
+.bb-row .amt{font-weight:700;color:var(--text);white-space:nowrap;flex-shrink:0}
+.bb-total{background:var(--accent-soft);border-top:2px solid var(--accent-border)}
+.bb-total .lbl{color:var(--accent);font-weight:700}
+.bb-total .amt{color:var(--accent);font-size:15px}
+
+/* status buttons trong panel */
+.status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.status-btn{padding:9px 6px;border-radius:var(--r);border:2px solid transparent;font-family:'Quicksand',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:var(--t-micro);white-space:nowrap;min-width:0}
+.status-btn:active{transform:scale(.95)}
+.status-btn.collected{background:var(--up-soft);color:var(--up);border-color:var(--up-border)}
+.status-btn.collected.active,.status-btn.collected:hover{background:var(--up);color:#fff}
+.status-btn.pending{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-border)}
+.status-btn.pending.active,.status-btn.pending:hover{background:var(--warn);color:#fff}
+.status-btn.overdue{background:var(--down-soft);color:var(--down);border-color:var(--down-border)}
+.status-btn.overdue.active,.status-btn.overdue:hover{background:var(--down);color:#fff}
+
+/* Flash nhẹ cho phần tử vừa cập nhật tại chỗ (thay vì fade lại cả khối cha) */
+@keyframes flashUpdate{0%{background:var(--accent-soft)}100%{background:transparent}}
+.flash-update{animation:flashUpdate .72s var(--ease-out)}
+
+/* timeline nhỏ */
+.mini-tl{display:flex;flex-direction:column;gap:0}
+.mini-tl-item{display:grid;grid-template-columns:14px 1fr;gap:12px;padding-bottom:16px;position:relative}
+.mini-tl-item:last-child{padding-bottom:0}
+.mini-tl-item:not(:last-child)::after{content:'';position:absolute;left:6px;top:16px;bottom:0;width:2px;background:var(--border)}
+.mini-tl-dot{width:14px;height:14px;border-radius:50%;background:var(--surface);border:2.5px solid currentColor;margin-top:2px;flex-shrink:0;position:relative;z-index:1}
+.mini-tl-dot::after{content:'';position:absolute;inset:2px;border-radius:50%;background:currentColor;opacity:.3}
+.mini-tl-date{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.mini-tl-text{font-size:12.5px;font-weight:700;color:var(--text);margin-top:1px}
+.mini-tl-sub{font-size:11.5px;color:var(--muted);font-weight:600}
+
+/* Report page */
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* chart bar đơn giản */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:130px;padding:10px 0 0}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height var(--t-bar) var(--ease-std)}
+.bar-lbl{font-size:10px;font-weight:700;color:var(--muted);text-align:center}
+.bar-val{font-size:10px;font-weight:700;color:var(--text2)}
+
+/* Divider */
+.divider{height:1px;background:var(--border);margin:.5rem 0}
+
+/* số phòng trống nổi bật */
+.empty-rooms-tag{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn-border);border-radius:7px;padding:2px 9px;font-size:11px;font-weight:700}
+
+/* Bill table nhập nhanh */
+.bt-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.bt-table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+.bt-table th{background:var(--surface2);color:var(--muted);font-size:11px;font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+.bt-table td{padding:7px 8px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.bt-table tr:last-child td{border-bottom:none}
+.bt-table tfoot td{background:var(--surface2);font-weight:700;font-size:13px;border-top:2px solid var(--border)}
+.bt-input{width:100%;min-width:80px;border:1.5px solid var(--border);border-radius:8px;padding:6px 8px;font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;background:var(--surface);color:var(--text);outline:none;text-align:right;transition:border-color var(--t-micro)}
+.bt-input:focus{border-color:var(--accent)}
+.bt-input.readonly{background:var(--surface2);color:var(--muted);cursor:default}
+.bt-total{font-weight:700;color:var(--accent);white-space:nowrap}
+.bt-kwh{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+.bt-other{font-size:11px;color:var(--muted);font-weight:600;cursor:help;border-bottom:1px dashed var(--muted)}
+.bt-empty{color:var(--muted);font-style:italic;font-size:12px}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><i class="ti ti-building-estate"></i></div>
+      <div class="logo-text">Domos<small>QUẢN LÝ PHÒNG TRỌ</small></div>
+    </div>
+    <div style="padding:.5rem .75rem;display:flex;flex-direction:column;gap:2px;flex:1">
+      <div class="sidebar-section">Tổng quan</div>
+      <button class="nav-btn active" onclick="showSection('home')" id="nav-home">
+        <i class="ti ti-layout-dashboard"></i> Tổng quan
+      </button>
+      <div class="sidebar-section" style="margin-top:.5rem">Quản lý</div>
+      <button class="nav-btn" onclick="showSection('collect')" id="nav-collect">
+        <i class="ti ti-coin"></i> Thu tiền tháng
+      </button>
+      <button class="nav-btn" onclick="showSection('electric')" id="nav-electric">
+        <i class="ti ti-bolt"></i> Nhập điện
+      </button>
+      <button class="nav-btn" onclick="showSection('maintenance')" id="nav-maintenance">
+        <i class="ti ti-tool"></i> Sửa chữa
+        <span class="nav-badge" id="badge-maint" style="opacity:0;transform:scale(0);transition:opacity var(--t-micro) var(--ease-out),transform var(--t-micro) var(--ease-out)">0</span>
+      </button>
+      <div class="sidebar-section" style="margin-top:.5rem">Báo cáo</div>
+      <button class="nav-btn" onclick="showSection('report')" id="nav-report">
+        <i class="ti ti-chart-bar"></i> Dòng tiền & Báo cáo
+      </button>
+      <button class="nav-btn" onclick="showSection('history')" id="nav-history">
+        <i class="ti ti-history"></i> Lịch sử thu & điện
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-row" onclick="openAdminModal()" title="Sửa thông tin cá nhân">
+        <div class="avatar"><i class="ti ti-user"></i></div>
+        <div><div class="user-name" id="sidebar-admin-name">Admin</div><div class="user-sub" id="sidebar-admin-role">Chủ nhà</div></div>
+        <i class="ti ti-pencil" style="margin-left:auto;font-size:14px;color:rgba(255,255,255,.3);flex-shrink:0"></i>
+      </div>
+    </div>
+  </nav>
+  <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Mở menu" style="display:none"><i class="ti ti-menu-2"></i></button>
+        <div>
+          <div class="page-title" id="topbar-title">Tổng quan</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="openAddHouseModal()" title="Thêm nhà mới"><i class="ti ti-plus"></i></button>
+        <button class="icon-btn" id="backup-btn" onclick="exportData()" title="Xuất dữ liệu backup"><i class="ti ti-download"></i><span id="backup-dot" style="display:block;opacity:0;transform:scale(0);position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--down);border:2px solid var(--surface);transition:opacity var(--t-micro) var(--ease-out),transform var(--t-micro) var(--ease-out)"></span></button>
+        <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="Nhập dữ liệu"><i class="ti ti-upload"></i></button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+      </div>
+    </header>
+
+    <!-- Backup warning banner -->
+    <div id="backup-banner" style="display:flex;align-items:center;gap:10px;background:#FEF3C7;border-bottom:1px solid #FDE68A;padding:10px 20px;font-size:13px;color:#92400E;font-weight:700">
+      <i class="ti ti-alert-triangle" style="font-size:18px;color:#D97706;flex-shrink:0"></i>
+      <span id="backup-banner-msg"></span>
+      <button onclick="exportData()" style="margin-left:auto;background:#D97706;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;white-space:nowrap"><i class="ti ti-download"></i> Backup ngay</button>
+      <button onclick="dismissBackupBanner()" style="background:none;border:none;cursor:pointer;color:#92400E;font-size:18px;padding:0 4px" title="Bỏ qua hôm nay"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ HOME ══ -->
+      <section class="section active" id="sec-home">
+        <div id="global-search-bar" style="margin-bottom:1rem"></div>
+        <div id="global-search-results" style="margin-bottom:1.2rem"></div>
+        <div id="home-metrics" style="margin-bottom:1.5rem"></div>
+        <div class="sec-hd">
+          <div><div class="sec-title">Nhà đang quản lý</div><div class="sec-sub">Click vào nhà để xem chi tiết từng phòng</div></div>
+          <button class="btn btn-primary" onclick="openAddHouseModal()"><i class="ti ti-plus"></i> Thêm nhà</button>
+        </div>
+        <div class="houses-grid" id="home-houses"></div>
+      </section>
+
+      <!-- ══ HOUSES LIST ══ -->
+      <section class="section" id="sec-houses">
+        <div class="sec-hd">
+          <div><div class="sec-title">Danh sách nhà</div></div>
+          <button class="btn btn-primary" onclick="openAddHouseModal()"><i class="ti ti-plus"></i> Thêm nhà</button>
+        </div>
+        <div class="houses-grid" id="houses-list"></div>
+      </section>
+
+      <!-- ══ HOUSE DETAIL ══ -->
+      <section class="section" id="sec-house-detail">
+        <button class="back-btn" onclick="backFromHouse()"><i class="ti ti-arrow-left"></i> Quay lại</button>
+        <div id="house-detail-content"></div>
+      </section>
+
+      <!-- ══ COLLECT ══ -->
+      <section class="section" id="sec-collect">
+        <div class="sec-hd">
+          <div>
+            <div class="sec-title">Thu tiền tháng</div>
+            <div class="sec-sub">Đánh dấu trạng thái thu tiền từng phòng<span id="collect-billing-note"></span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <select id="collect-month-select" onchange="onCollectMonthChange(this.value)" style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;border:1.5px solid var(--border);border-radius:var(--r);padding:7px 11px;background:var(--surface);outline:none;color:var(--text);cursor:pointer"></select>
+          </div>
+        </div>
+        <div id="collect-content"></div>
+      </section>
+
+      <!-- ══ ELECTRIC ══ -->
+      <section class="section" id="sec-electric">
+        <div class="sec-hd">
+          <div><div class="sec-title">Nhập điện</div><div class="sec-sub">Chọn nhà để nhập chỉ số điện hoặc xem bill tháng này</div></div>
+        </div>
+        <div id="electric-content"></div>
+      </section>
+
+      <!-- ══ MAINTENANCE ══ -->
+      <section class="section" id="sec-maintenance">
+        <div class="sec-hd">
+          <div><div class="sec-title">Sửa chữa & Bảo trì</div></div>
+          <button class="btn btn-primary" onclick="openAddMaintModal()"><i class="ti ti-plus"></i> Thêm việc</button>
+        </div>
+        <div id="maint-content"></div>
+      </section>
+
+      <!-- ══ REPORT ══ -->
+      <section class="section" id="sec-report">
+        <div class="sec-hd">
+          <div><div class="sec-title">Dòng tiền & Báo cáo</div></div>
+        </div>
+        <div id="report-content"></div>
+      </section>
+
+      <!-- ══ HISTORY ══ -->
+      <section class="section" id="sec-history">
+        <div class="sec-hd">
+          <div><div class="sec-title">Lịch sử thu & điện</div><div class="sec-sub">Lịch sử thu tiền và chỉ số điện theo tháng</div></div>
+        </div>
+        <div id="history-content"></div>
+      </section>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ROOM DETAIL PANEL -->
+<div class="room-detail-overlay" id="roomPanel">
+  <div class="room-detail-backdrop" onclick="closeRoomPanel()"></div>
+  <div class="room-detail-panel">
+    <div class="rdp-header">
+      <div>
+        <div class="rdp-room" id="rdp-room-name">Phòng</div>
+        <div class="rdp-tenant" id="rdp-tenant-name"></div>
+      </div>
+      <button style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;width:32px;height:32px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px" onclick="closeRoomPanel()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="rdp-scroll" id="rdp-scroll"></div>
+    <div id="rdp-footer" style="padding:1rem 1.6rem;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--surface2);flex-shrink:0;border-radius:0 0 var(--r-2xl) var(--r-2xl)"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-scroll" id="modalScroll">
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+    <div class="modal-footer" id="modalFooter" style="display:none"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ════════════════════════════════════════
+   DATABASE & STORAGE
+════════════════════════════════════════ */
+const STORAGE_KEY = 'domos-v5';
+
+const DEFAULT_DB = {
+  houses:[
+    {id:'h01', name:'Nhà trọ Hoàng Mai', address:'Hoàng Mai, Hà Nội', landlord:'Anh Tuấn',
+     masterRent:12000000, deposit:24000000, setupCost:15000000, opex:800000,
+     leaseStart:'2025-01-01', leaseEnd:'2027-01-01',
+     rooms:[
+      {id:'r01', number:'P01', tenantName:'Nguyễn Văn A', phone:'0901234567', rent:3200000,
+       electric:{prev:1200,curr:1285,price:3500}, water:100000,
+       contractStart:'2025-02-01', contractEnd:'2026-08-01',
+       deposit:6400000, depositStatus:'Đã thu', status:'Đang thuê', note:'Hẹn đóng tiền ngày 5'},
+      {id:'r02', number:'P02', tenantName:'Trần Thị B', phone:'0912345678', rent:3000000,
+       electric:{prev:980,curr:1045,price:3500}, water:100000,
+       contractStart:'2025-03-01', contractEnd:'2026-07-15',
+       deposit:6000000, depositStatus:'Đã thu', status:'Đang thuê', note:'Cần thay khóa cửa'},
+      {id:'r03', number:'P03', tenantName:'', phone:'', rent:3200000,
+       electric:{prev:0,curr:0,price:3500}, water:100000,
+       contractStart:'', contractEnd:'',
+       deposit:0, depositStatus:'Chưa thu', status:'Trống', note:''},
+      {id:'r04', number:'P04', tenantName:'Lê Văn C', phone:'0923456789', rent:3500000,
+       electric:{prev:980,curr:1065,price:3500}, water:100000,
+       contractStart:'2025-04-01', contractEnd:'2027-04-01',
+       deposit:7000000, depositStatus:'Đã thu', status:'Đang thuê', note:''},
+      {id:'r05', number:'P05', tenantName:'Phạm Thị D', phone:'0934567890', rent:3200000,
+       electric:{prev:760,curr:840,price:3500}, water:100000,
+       contractStart:'2025-06-01', contractEnd:'2026-06-01',
+       deposit:6400000, depositStatus:'Đã thu', status:'Đang thuê', note:'Chưa quyết định ở thêm'},
+    ]},
+    {id:'h02', name:'Mini House Cầu Giấy', address:'Cầu Giấy, Hà Nội', landlord:'Bà Lan',
+     masterRent:18000000, deposit:36000000, setupCost:22000000, opex:1200000,
+     leaseStart:'2024-07-01', leaseEnd:'2026-07-01',
+     rooms:[
+      {id:'r06', number:'P01', tenantName:'Hoàng Minh E', phone:'0945678901', rent:4500000,
+       electric:{prev:2300,curr:2398,price:3500}, water:120000,
+       contractStart:'2024-08-01', contractEnd:'2026-08-01',
+       deposit:9000000, depositStatus:'Đã thu', status:'Đang thuê', note:''},
+      {id:'r07', number:'P02', tenantName:'Vũ Thị F', phone:'0956789012', rent:4200000,
+       electric:{prev:1800,curr:1875,price:3500}, water:120000,
+       contractStart:'2024-09-01', contractEnd:'2025-09-01',
+       deposit:8400000, depositStatus:'Đã thu', status:'Đang thuê', note:'Hẹn đóng tiền ngày 10'},
+      {id:'r08', number:'P03', tenantName:'', phone:'', rent:4500000,
+       electric:{prev:0,curr:0,price:3500}, water:120000,
+       contractStart:'', contractEnd:'',
+       deposit:0, depositStatus:'Chưa thu', status:'Trống', note:''},
+      {id:'r09', number:'P04', tenantName:'Đặng Văn G', phone:'0967890123', rent:4800000,
+       electric:{prev:1500,curr:1572,price:3500}, water:120000,
+       contractStart:'2025-01-01', contractEnd:'2027-01-01',
+       deposit:9600000, depositStatus:'Đã thu', status:'Đang thuê', note:''},
+    ]},
+  ],
+  collectStatus:{}, // key: houseId_roomId_YYYY-MM → 'Đã thu'|'Chưa thu'|'Quá hạn'
+  maintenance:[
+    {id:'m01', houseId:'h01', room:'P02', title:'Thay khóa cửa', desc:'Khóa cửa bị kẹt', status:'Chưa làm', cost:0, createdAt:'2026-06-10', completedAt:'', note:''},
+  ],
+  admin:{name:'Admin', role:'Chủ nhà', phone:'', email:'', billingDay:1},
+  // key: houseId_roomId_YYYY-MM → {prev, curr, price, water} — lưu lịch sử điện từng tháng
+  electricHistory:{},
+  // key: houseId_roomId_YYYY-MM → số tiền tổng đã thu (snapshot khi đánh dấu Đã thu)
+  collectHistory:{},
+};
+
+let DB = JSON.parse(JSON.stringify(DEFAULT_DB));
+
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const p = JSON.parse(raw);
+      if(p && p.houses) DB = Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_DB)), p);
+    }
+    // migrate: đảm bảo field mới luôn tồn tại
+    if(!DB.electricHistory) DB.electricHistory = {};
+    if(!DB.collectHistory) DB.collectHistory = {};
+  }catch(e){ console.warn('Domos: load error', e); }
+}
+function saveDB(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); }
+  catch(e){ toast('Lỗi lưu dữ liệu','ti-alert-triangle','var(--down)'); }
+}
+loadDB();
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+let _id = Date.now();
+function nextId(){ return 'id'+(++_id); }
+function fmtVND(n){
+  if(!n||n===0) return '0 đ';
+  const abs=Math.abs(n),sign=n<0?'-':'';
+  if(abs>=1e9) return sign+(abs/1e9).toFixed(1).replace('.0','')+' tỷ';
+  if(abs>=1e6){ const val=Math.round(abs/1e6*10)/10; const s=Number.isInteger(val)?val.toLocaleString('vi-VN'):val.toLocaleString('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1}); return sign+s+' tr'; }
+  return sign+abs.toLocaleString('vi-VN')+' đ';
+}
+function fmtDate(s){ if(!s) return '—'; const d=new Date(s); return d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function todayStr(){ const n=new Date(); return n.getFullYear()+'-'+(n.getMonth()+1).toString().padStart(2,'0')+'-'+n.getDate().toString().padStart(2,'0'); }
+function thisMonth(){
+  const n = new Date();
+  const billingDay = (DB.admin && DB.admin.billingDay) || 1;
+  let y = n.getFullYear(), m = n.getMonth()+1;
+  if(n.getDate() < billingDay){
+    m -= 1;
+    if(m===0){ m=12; y-=1; }
+  }
+  return y+'-'+m.toString().padStart(2,'0');
+}
+function prevMonthOf(month){
+  const [y,m] = month.split('-').map(Number);
+  return m===1 ? `${y-1}-12` : `${y}-${String(m-1).padStart(2,'0')}`;
+}
+function daysUntil(s){ if(!s) return null; const d=new Date(s),now=new Date(); now.setHours(0,0,0,0); return Math.round((d-now)/86400000); }
+function houseById(id){ return DB.houses.find(h=>h.id===id); }
+
+/* ════════════════════════════════════════
+   FORMAT SỐ TIỀN REALTIME (type=text)
+════════════════════════════════════════ */
+
+// Đọc raw number từ ô text đã format (bỏ dấu chấm)
+function readNum(id){
+  const el = document.getElementById(id);
+  if(!el) return 0;
+  return parseFloat(el.value.replace(/\./g,'')) || 0;
+}
+
+// Format số thành dạng 3.000.000
+function addDots(str){
+  const digits = str.replace(/[^\d]/g,'');
+  if(!digits) return '';
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Gắn blur-format cho 1 input tiền:
+// - Đang gõ: bình thường, không can thiệp
+// - Click ra ngoài (blur): format thành 3.000.000
+// - Click vào lại (focus): hiện số thuần để dễ sửa
+function attachMoneyInput(el){
+  if(!el || el._moneyAttached) return;
+  el._moneyAttached = true;
+  el.type = 'text';
+  el.inputMode = 'numeric';
+
+  // Format giá trị ban đầu nếu có
+  const init = parseInt(String(el.value).replace(/[^\d]/g,''), 10);
+  if(!isNaN(init) && init !== 0) el.value = addDots(String(init));
+
+  // Focus: bỏ dấu chấm để gõ thoải mái
+  el.addEventListener('focus', function(){
+    this.value = this.value.replace(/\./g,'');
+  });
+
+  // Blur: chèn dấu chấm nghìn
+  el.addEventListener('blur', function(){
+    const digits = this.value.replace(/[^\d]/g,'');
+    this.value = digits ? addDots(digits) : '';
+  });
+}
+
+// MutationObserver — tự động gắn cho TẤT CẢ input[inputmode="numeric"]
+// Không dùng danh sách ID cứng → không bao giờ bị sót field mới
+(function(){
+  function scanAndAttach(root){
+    (root||document).querySelectorAll('input[inputmode="numeric"]').forEach(attachMoneyInput);
+  }
+  const observer = new MutationObserver(()=>{ scanAndAttach(document.body); });
+  observer.observe(document.body, {childList:true, subtree:true});
+})();
+function roomById(hId,rId){ const h=houseById(hId); return h?h.rooms.find(r=>r.id===rId):null; }
+function naturalSort(a, b){ return a.number.localeCompare(b.number, undefined, {numeric:true, sensitivity:'base'}); }
+function collectKey(hId,rId,month){ return hId+'_'+rId+'_'+month; }
+// Dọn dữ liệu collectStatus/collectHistory/electricHistory gắn với 1 phòng khi xóa phòng (hoặc xóa cả nhà)
+// để không sót dữ liệu rác trong localStorage và lịch sử không bị "ma" (key vẫn còn nhưng phòng đã mất).
+function purgeRoomKeys(hId, rId){
+  const prefix = hId+'_'+rId+'_';
+  [DB.collectStatus, DB.collectHistory, DB.electricHistory].forEach(store=>{
+    if(!store) return;
+    Object.keys(store).forEach(k=>{ if(k.indexOf(prefix)===0) delete store[k]; });
+  });
+}
+function getCollectStatus(hId,rId,month){ return DB.collectStatus[collectKey(hId,rId,month)]||'Chưa thu'; }
+// Phòng có tính vào danh sách thu tiền/báo cáo của 1 tháng hay không.
+// Tháng hiện tại: theo trạng thái sống của phòng (Trống thì không tính).
+// Tháng quá khứ: phòng dù đã chuyển Trống ở hiện tại vẫn phải tính nếu tháng đó từng có dữ liệu (đã thu/đã nhập điện) —
+// tránh việc lịch sử/báo cáo các tháng cũ biến mất chỉ vì khách đã trả phòng sau đó.
+function roomActiveForMonth(hId, r, month){
+  if(r.status!=='Trống') return true;
+  if(month===thisMonth()) return false;
+  return !!DB.collectStatus[collectKey(hId,r.id,month)] || !!DB.electricHistory?.[collectKey(hId,r.id,month)];
+}
+function setCollectStatus(hId,rId,month,status,amount){
+  DB.collectStatus[collectKey(hId,rId,month)] = status;
+  if(status==='Đã thu' && amount!=null){
+    if(!DB.collectHistory) DB.collectHistory={};
+    DB.collectHistory[collectKey(hId,rId,month)] = amount;
+  }
+  saveDB();
+}
+
+function calcRoomBill(houseId, room){
+  // Tháng hiện tại cũng phải lấy đúng dữ liệu đã "chốt" trong electricHistory (giống tháng quá khứ),
+  // không lấy thẳng room.electric — tránh trường hợp giá điện/chỉ số bị sửa lại sau khi đã tính/đã thu.
+  return calcRoomBillForMonth(houseId, room, thisMonth());
+}
+// Tính bill của một phòng cho một tháng cụ thể (kể cả tháng quá khứ),
+// dùng electricHistory để lấy đúng chỉ số điện đã ghi nhận tại thời điểm đó
+// thay vì lấy chỉ số điện "hiện tại" của phòng (có thể đã đổi sau đó).
+function calcRoomBillForMonth(houseId, room, month){
+  const hist = DB.electricHistory?.[collectKey(houseId,room.id,month)];
+  if(!hist){
+    // Không có lịch sử điện tháng đó — vẫn tính tiền phòng/nước/phí khác, điện = 0
+    const otherFees = room.otherFees||[];
+    const otherTotal = otherFees.reduce((s,f)=>s+(f.amount||0),0);
+    return {kwh:0, elec:0, water:room.water||0, rent:room.rent, otherFees, otherTotal, total:room.rent+(room.water||0)+otherTotal, hasElecData:false, prev:0, curr:0, price:room.electric?.price||3500};
+  }
+  const kwh = Math.max(0,(hist.curr||0)-(hist.prev||0));
+  const elec = kwh*(hist.price||3500);
+  const water = hist.water!=null?hist.water:(room.water||0);
+  const otherFees = room.otherFees||[];
+  const otherTotal = otherFees.reduce((s,f)=>s+(f.amount||0),0);
+  const total = room.rent + elec + water + otherTotal;
+  return {kwh, elec, water, rent:room.rent, otherFees, otherTotal, total, hasElecData:true, prev:hist.prev||0, curr:hist.curr||0, price:hist.price||3500};
+}
+
+function statusBadge(s){
+  const m={'Đang thuê':'up','Đã thu':'up','Đã trả':'up',
+    'Trống':'empty','Chưa thu':'warn','Quá hạn':'down',
+    'Chưa làm':'warn','Đang làm':'accent','Đã xong':'up','Đã thu cọc':'up','Chưa thu':'warn'};
+  return `<span class="badge badge-${m[s]||'neutral'}">${s||'—'}</span>`;
+}
+function badge(t,c='neutral'){ return `<span class="badge badge-${c}">${t}</span>`; }
+
+/* ════════════════════════════════════════
+   FADE-SWAP — gán innerHTML kèm hiệu ứng vào nhẹ,
+   dùng cho mọi nội dung thay thế tức thì sau khi
+   click tab / đổi tháng / mở phòng khác...
+════════════════════════════════════════ */
+function fadeSwap(target, html){
+  const el = typeof target==='string' ? document.getElementById(target) : target;
+  if(!el) return;
+  el.innerHTML = html;
+  el.classList.remove('fade-swap');
+  void el.offsetWidth; // force reflow để animation chạy lại mỗi lần
+  el.classList.add('fade-swap');
+}
+// Thu gọn/mở rộng note-block — dùng scrollHeight thật của nội dung thay vì cap cố định,
+// để transition max-height chạy đều suốt toàn bộ thời lượng thay vì "mở phựt" rồi khựng.
+function toggleNoteBlock(id){
+  const block = document.getElementById(id);
+  if(!block) return;
+  const body = block.querySelector('.note-body');
+  if(!body) return;
+  if(block.classList.contains('open')){
+    body.style.maxHeight = '0px';
+    block.classList.remove('open');
+  } else {
+    block.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+// Xoá 1 phần tử kèm hiệu ứng mờ dần/trượt nhẹ, dùng cho các dòng động (vd: dòng phí thêm/xoá)
+function removeFadeRow(btn, selector='.r-fee-row'){
+  const row = btn.closest(selector);
+  if(!row) return;
+  row.classList.add('removing');
+  setTimeout(()=>row.remove(), 318);
+}
+
+/* ════════════════════════════════════════
+   TOAST
+════════════════════════════════════════ */
+function toast(msg, icon='ti-circle-check', color='var(--up)', actionLabel, actionOnclick){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<i class="ti ${icon}" style="color:${color}"></i>${msg}${actionLabel?`<button type="button" style="margin-left:6px;background:rgba(255,255,255,.15);border:none;color:#fff;font-weight:700;font-size:12px;padding:5px 10px;border-radius:7px;cursor:pointer;white-space:nowrap" onclick="${actionOnclick};this.closest('.toast').classList.add('out');setTimeout(()=>this.closest('.toast')?.remove(),462)">${actionLabel}</button>`:''}`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),462); }, actionLabel?5500:2800);
+}
+
+/* ════════════════════════════════════════
+   ADMIN PROFILE (người quản lý)
+════════════════════════════════════════ */
+function renderAdminBar(){
+  const a = DB.admin || {};
+  document.getElementById('sidebar-admin-name').textContent = a.name || 'Admin';
+  document.getElementById('sidebar-admin-role').textContent = a.role || 'Chủ nhà';
+}
+function openAdminModal(){
+  const a = DB.admin || {};
+  const v = (f,d='')=>a[f]??d;
+  openModal(`<i class="ti ti-user-circle"></i>Thông tin cá nhân`,`
+    <div class="form-grid">
+      <div class="fg full"><label>Họ tên *</label><input type="text" id="adm-name" value="${v('name')}" placeholder="VD: Nguyễn Văn A" required></div>
+      <div class="fg full"><label>Vai trò / chức danh</label><input type="text" id="adm-role" value="${v('role')}" placeholder="VD: Chủ nhà, Quản lý..."></div>
+      <div class="fg"><label>Số điện thoại</label><input type="text" id="adm-phone" value="${v('phone')}" placeholder="09xxxxxxxx"></div>
+      <div class="fg"><label>Email</label><input type="email" id="adm-email" value="${v('email')}" placeholder="ten@email.com"></div>
+      <div class="fg full"><label>Ngày thu tiền hàng tháng</label><input type="number" id="adm-billday" min="1" max="28" value="${v('billingDay',1)}">
+        <div class="hint">Mỗi kỳ thu tiền sẽ tự tính từ ngày này đến ngày trước đó của tháng sau, áp dụng cho toàn bộ phòng/nhà</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="submitAdmin()"><i class="ti ti-check"></i>Lưu</button>
+    </div>
+  `);
+}
+function submitAdmin(){
+  const v=id=>document.getElementById(id)?.value.trim()||'';
+  if(!v('adm-name')){ toast('Vui lòng nhập họ tên','ti-alert-circle','var(--down)'); return; }
+  let billingDay = parseInt(document.getElementById('adm-billday')?.value)||1;
+  billingDay = Math.min(28, Math.max(1, billingDay));
+  const oldDay = (DB.admin && DB.admin.billingDay) || 1;
+  if(billingDay !== oldDay){
+    const ok = confirm(`Bạn đang đổi ngày thu tiền từ ngày ${oldDay} sang ngày ${billingDay}.\n\nĐiều này thay đổi "tháng hiện tại" của toàn hệ thống — có thể khiến thu tiền, nhập điện và báo cáo hiển thị sai tháng nếu đổi giữa chừng kỳ đang có dữ liệu.\n\nChỉ nên đổi khi bắt đầu kỳ mới và chưa nhập liệu gì cho kỳ hiện tại.\n\nTiếp tục đổi?`);
+    if(!ok) return;
+  }
+  DB.admin = {name:v('adm-name'), role:v('adm-role'), phone:v('adm-phone'), email:v('adm-email'), billingDay};
+  saveDB(); closeModal(); renderAdminBar();
+  if(CURRENT_SECTION==='home') renderHome();
+  else if(CURRENT_SECTION==='collect') renderCollect();
+  else if(CURRENT_SECTION==='report') renderReport();
+  toast('Đã lưu thông tin cá nhân');
+}
+
+/* ════════════════════════════════════════
+   MODAL
+════════════════════════════════════════ */
+function openModal(title, body, size){
+  // Tách footer ra khỏi body nếu có
+  const temp = document.createElement('div');
+  temp.innerHTML = body;
+  const footerEl = temp.querySelector('.modal-footer');
+  if(footerEl) footerEl.remove();
+  
+  document.getElementById('modalTitle').innerHTML = title;
+  document.getElementById('modalBody').innerHTML = temp.innerHTML;
+  
+  // Đặt footer bên ngoài scroll
+  const mf = document.getElementById('modalFooter');
+  if(footerEl){ mf.innerHTML = footerEl.innerHTML; mf.style.display='flex'; }
+  else { mf.innerHTML=''; mf.style.display='none'; }
+
+  // Size
+  const box = document.querySelector('.modal-box');
+  if(box) box.classList.toggle('large', size==='large');
+  
+  document.getElementById('modalScroll').scrollTop = 0;
+  const ov = document.getElementById('modalOverlay');
+  ov.classList.add('open');
+  requestAnimationFrame(()=>ov.classList.add('show'));
+}
+function closeModal(){
+  const ov = document.getElementById('modalOverlay');
+  ov.classList.remove('show');
+  const box = document.querySelector('.modal-box');
+  if(box) box.classList.remove('large');
+  setTimeout(()=>ov.classList.remove('open'), 576);
+}
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+let CURRENT_SECTION = 'home';
+let CURRENT_HOUSE_ID = null;
+let FROM_SECTION = 'home';
+let GLOBAL_SEARCH_QUERY = '';
+let GLOBAL_SEARCH_FILTER = 'Tất cả';
+let ELEC_HISTORY_MONTH = '';
+let REPORT_MONTH = '';
+let COLLECT_MONTH = '';
+
+function toggleSidebar(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  if(sb.classList.contains('open')){
+    sb.classList.remove('open');
+    ov.classList.remove('show');
+    setTimeout(()=>ov.classList.remove('open'), 462);
+  } else {
+    sb.classList.add('open');
+    ov.classList.add('open');
+    requestAnimationFrame(()=>ov.classList.add('show'));
+  }
+}
+function closeSidebarIfMobile(){
+  if(window.innerWidth<=860){
+    const sb = document.querySelector('.sidebar');
+    const ov = document.getElementById('sidebar-overlay');
+    sb.classList.remove('open');
+    ov.classList.remove('show');
+    setTimeout(()=>ov.classList.remove('open'), 462);
+  }
+}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  const nb = document.getElementById('nav-'+id);
+  if(nb) nb.classList.add('active');
+  CURRENT_SECTION = id;
+  const titles = {home:'Tổng quan',houses:'Danh sách nhà',collect:'Thu tiền tháng',electric:'Nhập điện',maintenance:'Sửa chữa & Bảo trì',report:'Dòng tiền & Báo cáo',history:'Lịch sử thu & điện'};
+  document.getElementById('topbar-title').textContent = titles[id]||'Domos';
+  renderSection(id);
+  closeSidebarIfMobile();
+}
+
+function showHouseDetail(houseId, fromSection){
+  FROM_SECTION = fromSection || CURRENT_SECTION;
+  CURRENT_HOUSE_ID = houseId;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-house-detail').classList.add('active');
+  CURRENT_SECTION = 'house-detail';
+  const h = houseById(houseId);
+  document.getElementById('topbar-title').textContent = h ? h.name : 'Chi tiết nhà';
+  renderHouseDetail(houseId);
+}
+
+function backFromHouse(){
+  showSection(FROM_SECTION === 'house-detail' ? 'home' : FROM_SECTION);
+}
+
+function renderSection(id){
+  if(id==='home') renderHome();
+  else if(id==='houses') renderHousesList();
+  else if(id==='collect') renderCollect();
+  else if(id==='electric') renderElectric();
+  else if(id==='maintenance') renderMaintenance();
+  else if(id==='report') renderReport();
+  else if(id==='history') renderHistory();
+}
+
+/* ════════════════════════════════════════
+   HOME
+════════════════════════════════════════ */
+function renderHome(){
+  const month = thisMonth();
+  let totalRooms=0, occupied=0, totalCollected=0, totalPending=0, totalOverdue=0, totalRent=0;
+  let amtPending=0, amtOverdue=0;
+  DB.houses.forEach(h=>{
+    h.rooms.forEach(r=>{
+      if(r.status==='Trống') return;
+      totalRooms++;
+      occupied++;
+      const bill = calcRoomBill(h.id, r);
+      const st = getCollectStatus(h.id, r.id, month);
+      if(st==='Đã thu') totalCollected += bill.total;
+      else if(st==='Quá hạn'){ totalOverdue++; amtOverdue+=bill.total; }
+      else { totalPending++; amtPending+=bill.total; }
+      totalRent += r.rent;
+    });
+  });
+
+  // Cảnh báo hợp đồng sắp hết hạn (60 ngày)
+  const expiryWarnings = [];
+  DB.houses.forEach(h=>{
+    const hd = daysUntil(h.leaseEnd);
+    if(hd!=null && hd<=60) expiryWarnings.push({type:'house', name:h.name, label:'HĐ nguyên căn', days:hd, id:h.id});
+    (h.rooms||[]).forEach(r=>{
+      if(r.status==='Trống') return;
+      const rd = daysUntil(r.contractEnd);
+      if(rd!=null && rd<=60) expiryWarnings.push({type:'room', name:h.name+' · '+r.number, label:r.tenantName, days:rd, hId:h.id, rId:r.id});
+    });
+  });
+
+  const alertBanner = expiryWarnings.length ? `
+    <div style="background:var(--warn-soft);border:1.5px solid var(--warn-border);border-radius:var(--r-lg);padding:1rem 1.2rem;margin-bottom:1.2rem;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--warn)">
+        <i class="ti ti-bell-ringing" style="font-size:18px"></i>
+        ${expiryWarnings.length} hợp đồng sắp hết hạn trong 60 ngày tới
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        ${expiryWarnings.map(w=>`
+          <div class="alert-item" style="background:var(--surface);border:1px solid var(--warn-border);border-radius:var(--r);padding:5px 11px;font-size:12px;cursor:pointer"
+            onclick="${w.type==='house'?`openEditHouseModal('${w.id}')`:`showHouseDetail('${w.hId}','home')`}">
+            <span style="font-weight:700;color:var(--text)">${w.name}</span>
+            <span style="color:var(--text2)"> · ${w.label}</span>
+            <span style="color:${w.days<0?'var(--down)':w.days<=14?'var(--down)':'var(--warn)'};font-weight:700;margin-left:4px">${w.days<0?'Đã hết hạn '+Math.abs(w.days)+' ngày':w.days+' ngày còn lại'}</span>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  // Cảnh báo công nợ quá hạn gộp từ tất cả nhà
+  const overdueWarnings = [];
+  DB.houses.forEach(h=>{
+    (h.rooms||[]).forEach(r=>{
+      if(r.status==='Trống') return;
+      if(getCollectStatus(h.id, r.id, month)==='Quá hạn'){
+        overdueWarnings.push({name:h.name+' · '+r.number, tenant:r.tenantName, amount:calcRoomBill(h.id, r).total, hId:h.id, rId:r.id});
+      }
+    });
+  });
+
+  const overdueBanner = overdueWarnings.length ? `
+    <div style="background:var(--down-soft);border:1.5px solid var(--down-border);border-radius:var(--r-lg);padding:1rem 1.2rem;margin-bottom:1.2rem;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--down)">
+        <i class="ti ti-cash-off" style="font-size:18px"></i>
+        ${overdueWarnings.length} phòng đang quá hạn tiền thuê
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        ${overdueWarnings.map(w=>`
+          <div class="alert-item" style="background:var(--surface);border:1px solid var(--down-border);border-radius:var(--r);padding:5px 11px;font-size:12px;cursor:pointer"
+            onclick="showHouseDetail('${w.hId}','home');setTimeout(()=>openRoomPanel('${w.hId}','${w.rId}'),50)">
+            <span style="font-weight:700;color:var(--text)">${w.name}</span>
+            <span style="color:var(--text2)"> · ${w.tenant}</span>
+            <span style="color:var(--down);font-weight:700;margin-left:4px">${fmtVND(w.amount)}</span>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  const metricsEl = document.getElementById('home-metrics');
+  fadeSwap(metricsEl, alertBanner + overdueBanner + `<div class="metrics" style="margin-bottom:0">
+    <div class="metric accent"><div class="metric-icon"><i class="ti ti-building-warehouse"></i></div>
+      <div class="metric-val">${DB.houses.length}</div><div class="metric-label">Nhà đang quản lý</div></div>
+    <div class="metric"><div class="metric-icon"><i class="ti ti-door"></i></div>
+      <div class="metric-val">${occupied}</div><div class="metric-label">Phòng đang cho thuê</div></div>
+    <div class="metric up"><div class="metric-icon"><i class="ti ti-circle-check"></i></div>
+      <div class="metric-val">${fmtVND(totalCollected)}</div><div class="metric-label">Đã thu tháng này</div></div>
+    <div class="metric warn"><div class="metric-icon"><i class="ti ti-clock"></i></div>
+      <div class="metric-val">${totalPending} phòng</div><div class="metric-label">Chưa thu${amtPending>0?' · '+fmtVND(amtPending):''}</div></div>
+    <div class="metric ${totalOverdue>0?'down':'neutral'}"><div class="metric-icon"><i class="ti ti-alert-circle"></i></div>
+      <div class="metric-val">${totalOverdue} phòng</div><div class="metric-label">Quá hạn / Nợ${amtOverdue>0?' · '+fmtVND(amtOverdue):''}</div></div>
+  </div>`);
+
+  fadeSwap('home-houses', DB.houses.length
+    ? DB.houses.map(h=>houseCardHTML(h, month)).join('')
+    : `<div style="grid-column:1/-1;background:var(--surface);border:1.5px dashed var(--border);border-radius:var(--r-xl);padding:2.5rem 2rem;text-align:center">
+      <i class="ti ti-home-plus" style="font-size:44px;color:var(--accent-mid);display:block;margin-bottom:1rem"></i>
+      <h3 style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Chào mừng đến với Domos!</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem">Bắt đầu bằng 3 bước đơn giản</p>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:340px;margin:0 auto 1.5rem">
+        <div style="display:flex;align-items:center;gap:12px;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--r-lg);padding:10px 14px;text-align:left">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--text)">Thêm nhà</div><div style="font-size:11.5px;color:var(--muted)">Nhập thông tin ngôi nhà bạn đang cho thuê</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:10px 14px;text-align:left">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--border);color:var(--muted);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--text2)">Thêm phòng & khách thuê</div><div style="font-size:11.5px;color:var(--muted)">Vào chi tiết nhà để thêm từng phòng</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:10px 14px;text-align:left">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--border);color:var(--muted);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--text2)">Nhập điện & thu tiền hàng tháng</div><div style="font-size:11.5px;color:var(--muted)">Dùng mục Nhập điện và Thu tiền tháng trên menu</div></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="openAddHouseModal()"><i class="ti ti-plus"></i> Thêm nhà đầu tiên</button>
+    </div>`);
+
+  renderGlobalSearchBar();
+  renderGlobalRoomSearch();
+  updateBadges();
+  animateCollectBars();
+}
+
+// Kích hoạt animation "lấp đầy" cho các thanh tiến độ thu tiền ở Trang chủ.
+// Bar được render với width:0 trước, sau đó set width thật ở khung hình kế tiếp
+// để trình duyệt có trạng thái "trước/sau" trên cùng node mà nội suy mượt.
+function animateCollectBars(){
+  const bars = document.querySelectorAll('#home-houses .collect-bar-fill[data-pct]');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    bars.forEach(b=>{ b.style.width = b.dataset.pct + '%'; });
+  }));
+}
+
+function houseCardHTML(h, month){
+  const rooms = h.rooms||[];
+  const active = rooms.filter(r=>r.status!=='Trống');
+  const empty = rooms.filter(r=>r.status==='Trống');
+  let collected=0, cntCollected=0;
+  active.forEach(r=>{
+    const st = getCollectStatus(h.id, r.id, month);
+    if(st==='Đã thu'){ const b=calcRoomBill(h.id, r); collected+=b.total; cntCollected++; }
+  });
+  const pct = active.length ? Math.round(cntCollected/active.length*100) : 0;
+  const barColor = pct===100?'var(--up)':pct>50?'var(--accent)':'var(--warn)';
+  const daysLeft = daysUntil(h.leaseEnd);
+  const leaseWarn = daysLeft!=null && daysLeft<=60; // đồng bộ ngưỡng với banner cảnh báo ở Tổng quan
+
+  return `<div class="house-card" onclick="showHouseDetail('${h.id}','${CURRENT_SECTION}')">
+    <div class="house-card-header">
+      <div style="display:flex;gap:11px;align-items:flex-start;min-width:0">
+        <div class="house-icon"><i class="ti ti-building-warehouse"></i></div>
+        <div style="min-width:0">
+          <div class="house-name">${h.name}</div>
+          <div class="house-addr"><i class="ti ti-map-pin"></i>${h.address}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0">
+        ${empty.length>0?`<span class="empty-rooms-tag">${empty.length} trống</span>`:''}
+        ${leaseWarn?badge('HĐ còn '+daysLeft+' ngày','warn'):''}
+      </div>
+    </div>
+    <div class="collect-bar-wrap">
+      <div class="collect-bar-label">
+        <span>Thu tiền tháng này</span>
+        <strong style="color:${barColor}">${cntCollected}/${active.length} phòng</strong>
+      </div>
+      <div class="collect-bar-track">
+        <div class="collect-bar-fill" data-pct="${pct}" style="width:0;background:${barColor}"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        <span style="font-size:11.5px;color:var(--muted);font-weight:600">${fmtVND(collected)} đã thu</span>
+        <span style="font-size:11.5px;font-weight:700;color:${barColor}">${pct}%</span>
+      </div>
+    </div>
+    <div class="house-card-footer">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="house-stat"><i class="ti ti-door"></i>${rooms.length} phòng</div>
+        <div class="house-stat"><i class="ti ti-cash"></i>${fmtVND(h.masterRent)}/th</div>
+        <div class="house-stat"><i class="ti ti-user"></i>${h.landlord||'—'}</div>
+      </div>
+      <button class="btn-enter" onclick="event.stopPropagation();showHouseDetail('${h.id}','${CURRENT_SECTION}')">
+        <i class="ti ti-arrow-right"></i> Vào xem
+      </button>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════
+   TÌM KIẾM PHÒNG XUYÊN TOÀN BỘ NHÀ
+════════════════════════════════════════ */
+function renderGlobalSearchBar(){
+  const filters = ['Tất cả','Chưa thu','Quá hạn','Trống'];
+  const filterColor = {'Tất cả':'accent','Chưa thu':'warn','Quá hạn':'down','Trống':'empty'};
+  document.getElementById('global-search-bar').innerHTML = `
+    <div class="fg full" style="margin-bottom:8px">
+      <input type="text" id="global-search-input" placeholder="Tìm phòng, khách thuê theo tên hoặc số phòng..."
+        value="${GLOBAL_SEARCH_QUERY}" oninput="onGlobalSearchInput(this.value)">
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px" id="filter-chip-row">
+      ${filters.map(f=>{
+        const isActive = GLOBAL_SEARCH_FILTER===f;
+        return `<span class="filter-chip${isActive?' active c-'+filterColor[f]:''}" data-filter="${f}" data-color="${filterColor[f]}" onclick="setGlobalSearchFilter('${f}')">
+          <span class="chip-dot"></span>${f}
+        </span>`;
+      }).join('')}
+    </div>`;
+}
+function onGlobalSearchInput(val){
+  GLOBAL_SEARCH_QUERY = val;
+  renderGlobalRoomSearch();
+}
+function setGlobalSearchFilter(f){
+  GLOBAL_SEARCH_FILTER = f;
+  document.querySelectorAll('.filter-chip').forEach(c=>{
+    c.classList.remove('active','c-accent','c-warn','c-down','c-empty');
+  });
+  const target = document.querySelector(`.filter-chip[data-filter="${f}"]`);
+  if(target) target.classList.add('active', 'c-'+target.dataset.color);
+  renderGlobalRoomSearch();
+  document.getElementById('global-search-input')?.focus();
+}
+function renderGlobalRoomSearch(){
+  const el = document.getElementById('global-search-results');
+  const q = GLOBAL_SEARCH_QUERY.trim().toLowerCase();
+  if(!q && GLOBAL_SEARCH_FILTER==='Tất cả'){ el.innerHTML=''; return; }
+  const month = thisMonth();
+  const matches = [];
+  DB.houses.forEach(h=>{
+    [...(h.rooms||[])].sort(naturalSort).forEach(r=>{
+      const text = (r.number+' '+(r.tenantName||'')).toLowerCase();
+      if(q && !text.includes(q)) return;
+      const st = r.status==='Trống' ? 'Trống' : getCollectStatus(h.id, r.id, month);
+      if(GLOBAL_SEARCH_FILTER==='Trống' && r.status!=='Trống') return;
+      if(GLOBAL_SEARCH_FILTER==='Chưa thu' && st!=='Chưa thu') return;
+      if(GLOBAL_SEARCH_FILTER==='Quá hạn' && st!=='Quá hạn') return;
+      matches.push({h, r, st});
+    });
+  });
+  if(!matches.length){
+    el.innerHTML = `<div class="empty" style="padding:1.5rem;animation:fadeUp var(--t-panel) var(--ease-out) both"><i class="ti ti-search-off"></i><p>Không tìm thấy phòng phù hợp</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="card" style="animation:fadeUp var(--t-panel) var(--ease-out) both">
+    <div class="card-header"><div class="card-title"><i class="ti ti-search"></i>Kết quả (${matches.length} phòng)</div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Nhà</th><th>Phòng</th><th>Khách thuê</th><th>Trạng thái</th><th></th></tr></thead>
+      <tbody>
+        ${matches.map(({h,r,st})=>`<tr>
+          <td>${h.name}</td>
+          <td><strong>${r.number}</strong></td>
+          <td>${r.tenantName||'—'}</td>
+          <td>${statusBadge(st)}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="showHouseDetail('${h.id}','home');setTimeout(()=>openRoomPanel('${h.id}','${r.id}'),50)"><i class="ti ti-eye"></i> Xem</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════
+   HOUSES LIST
+════════════════════════════════════════ */
+function renderHousesList(){
+  const month = thisMonth();
+  document.getElementById('houses-list').innerHTML = DB.houses.length
+    ? DB.houses.map(h=>houseCardHTML(h, month)).join('')
+    : `<div class="empty" style="grid-column:1/-1"><i class="ti ti-building-warehouse"></i><h3>Chưa có nhà nào</h3><p>Bấm "Thêm nhà" để bắt đầu</p></div>`;
+  updateBadges();
+}
+
+/* ════════════════════════════════════════
+   HOUSE DETAIL
+════════════════════════════════════════ */
+let DETAIL_TAB = 'rooms';
+function renderHouseDetail(houseId){
+  const h = houseById(houseId);
+  if(!h){ document.getElementById('house-detail-content').innerHTML='<div class="empty"><i class="ti ti-x"></i><h3>Không tìm thấy nhà</h3></div>'; return; }
+  const month = thisMonth();
+  const rooms = h.rooms||[];
+  const active = rooms.filter(r=>r.status!=='Trống');
+  const empty = rooms.filter(r=>r.status==='Trống');
+  let collected=0, cntC=0, cntO=0;
+  active.forEach(r=>{
+    const st=getCollectStatus(h.id,r.id,month);
+    const b=calcRoomBill(h.id, r);
+    if(st==='Đã thu'){collected+=b.total;cntC++;}
+    else if(st==='Quá hạn') cntO++;
+  });
+  const daysLeft = daysUntil(h.leaseEnd);
+
+  fadeSwap('house-detail-content', `
+    <div class="house-detail-header">
+      <div class="hdh-left">
+        <div class="hdh-name">${h.name}</div>
+        <div class="hdh-addr"><i class="ti ti-map-pin"></i>${h.address} · Chủ nhà: ${h.landlord||'—'}</div>
+        <div class="hdh-stats">
+          <div class="hdh-stat"><div class="hdh-stat-val">${rooms.length}</div><div class="hdh-stat-label">Tổng phòng</div></div>
+          <div class="hdh-stat"><div class="hdh-stat-val">${active.length}</div><div class="hdh-stat-label">Đang thuê</div></div>
+          <div class="hdh-stat"><div class="hdh-stat-val">${empty.length}</div><div class="hdh-stat-label">Trống</div></div>
+          <div class="hdh-stat"><div class="hdh-stat-val">${fmtVND(h.masterRent)}</div><div class="hdh-stat-label">Thuê nguyên căn</div></div>
+          <div class="hdh-stat"><div class="hdh-stat-val">${daysLeft!=null?(daysLeft<0?'Đã hết hạn':daysLeft+' ngày'):'—'}</div><div class="hdh-stat-label">${daysLeft!=null&&daysLeft<0?'HĐ nguyên căn':'HĐ còn lại'}</div></div>
+        </div>
+      </div>
+      <div class="hdh-right">
+        <button class="btn btn-outline" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#fff" onclick="openAddRoomModal('${h.id}')"><i class="ti ti-plus"></i> Thêm phòng</button>
+        <button class="btn btn-outline" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#fff" onclick="openEditHouseModal('${h.id}')"><i class="ti ti-pencil"></i> Chỉnh sửa thông tin</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn ${DETAIL_TAB==='rooms'?'active':''}" data-tab="rooms" onclick="switchDetailTab('rooms','${h.id}')"><i class="ti ti-door"></i> Phòng (${rooms.length})</button>
+      <button class="tab-btn ${DETAIL_TAB==='summary'?'active':''}" data-tab="summary" onclick="switchDetailTab('summary','${h.id}')"><i class="ti ti-chart-pie"></i> Tổng kết tháng</button>
+      <button class="tab-btn ${DETAIL_TAB==='info'?'active':''}" data-tab="info" onclick="switchDetailTab('info','${h.id}')"><i class="ti ti-info-circle"></i> Thông tin HĐ</button>
+    </div>
+    <div id="detail-tab-content"></div>
+  `);
+  renderDetailTab(houseId);
+}
+
+function switchDetailTab(tab, houseId){
+  DETAIL_TAB = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  renderDetailTab(houseId);
+}
+
+function renderDetailTab(houseId){
+  const h = houseById(houseId);
+  if(!h) return;
+  const el = document.getElementById('detail-tab-content');
+  if(!el) return;
+  if(DETAIL_TAB==='rooms') fadeSwap(el, renderRoomsTab(h));
+  else if(DETAIL_TAB==='summary') fadeSwap(el, renderSummaryTab(h));
+  else fadeSwap(el, renderInfoTab(h));
+}
+
+function roomCardId(hId, rId){ return 'rc_'+hId+'_'+rId; }
+function roomCardHTML(h, r){
+  const month = thisMonth();
+  const isEmpty = r.status==='Trống';
+  const bill = calcRoomBill(h.id, r);
+  const st = isEmpty ? 'Trống' : getCollectStatus(h.id, r.id, month);
+  const stClass = {Trống:'empty','Đã thu':'collected','Chưa thu':'pending','Quá hạn':'overdue'}[st]||'pending';
+  return `<div class="room-card status-${stClass}" id="${roomCardId(h.id,r.id)}" onclick="openRoomPanel('${h.id}','${r.id}')">
+      <div class="room-card-top">
+        <div>
+          <div class="room-number">${r.number}</div>
+          <div class="room-tenant">
+            ${isEmpty?'<i class="ti ti-door-off"></i> Phòng trống':`<i class="ti ti-user"></i>${r.tenantName}`}
+          </div>
+          ${!isEmpty&&r.contractEnd?`<div style="margin-top:3px;font-size:11px;color:var(--muted);font-weight:600">HĐ đến ${fmtDate(r.contractEnd)}</div>`:''}
+        </div>
+        ${statusBadge(st)}
+      </div>
+      ${!isEmpty?`<div class="room-bill">
+        <div class="bill-row"><span class="label"><i class="ti ti-home"></i>Tiền phòng</span><span class="val">${fmtVND(r.rent)}</span></div>
+        <div class="bill-row"><span class="label"><i class="ti ti-bolt"></i>Điện (${bill.kwh} kWh)</span><span class="val">${fmtVND(bill.elec)}</span></div>
+        <div class="bill-row"><span class="label"><i class="ti ti-droplet"></i>Nước</span><span class="val">${fmtVND(bill.water)}</span></div>
+        ${(bill.otherFees||[]).map(f=>`<div class="bill-row"><span class="label"><i class="ti ti-tag"></i>${f.name}</span><span class="val">${fmtVND(f.amount)}</span></div>`).join('')}
+        <div class="bill-total"><span class="label">Tổng tháng này</span><span class="val">${fmtVND(bill.total)}</span></div>
+      </div>`:'<div class="room-bill" style="text-align:center;padding:.75rem;color:var(--muted);font-size:12px">Phòng chưa có khách</div>'}
+      <div class="room-card-footer">
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openRoomPanel('${h.id}','${r.id}')"><i class="ti ti-eye"></i> Chi tiết</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditRoomModal('${h.id}','${r.id}')"><i class="ti ti-pencil"></i> Sửa</button>
+        ${!isEmpty?`<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();quickCollect('${h.id}','${r.id}','${month}','${st}')" title="Đổi trạng thái thu tiền tháng ${month}">
+          <i class="ti ti-${st==='Đã thu'?'circle-check':'circle'}"></i>${st==='Đã thu'?'Đã thu':'Đánh dấu thu'}<span style="font-size:10px;opacity:.6;margin-left:3px">${month}</span>
+        </button>`:''}
+      </div>
+    </div>`;
+}
+// Cập nhật tại chỗ đúng 1 room-card trong lưới phòng (không fade lại cả lưới).
+// Trả về true nếu tìm thấy & cập nhật được (lưới đang hiển thị trên DOM), false nếu không (panel/tab khác đang mở).
+function updateRoomCard(hId, rId){
+  const h = houseById(hId), r = roomById(hId, rId);
+  if(!h||!r) return false;
+  const old = document.getElementById(roomCardId(hId,rId));
+  if(!old) return false;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = roomCardHTML(h, r);
+  const fresh = wrap.firstElementChild;
+  fresh.classList.add('flash-update');
+  old.replaceWith(fresh);
+  setTimeout(()=>fresh.classList.remove('flash-update'), 780);
+  return true;
+}
+function renderRoomsTab(h){
+  if(!h.rooms||!h.rooms.length) return `<div class="empty"><i class="ti ti-door"></i><h3>Chưa có phòng nào</h3><p>Bấm "Thêm phòng" để thêm phòng đầu tiên</p></div>`;
+  const cards = [...h.rooms].sort(naturalSort).map(r=>roomCardHTML(h, r)).join('');
+  return `<div class="rooms-grid">${cards}</div>`;
+}
+
+function renderSummaryTab(h){
+  const month = thisMonth();
+  const rooms = [...(h.rooms||[])].sort(naturalSort).filter(r=>r.status!=='Trống');
+  let totalRevenue=0, totalCollected=0, cntC=0, cntP=0, cntO=0;
+  const rows = rooms.map(r=>{
+    const bill = calcRoomBill(h.id, r);
+    const st = getCollectStatus(h.id, r.id, month);
+    totalRevenue += bill.total;
+    if(st==='Đã thu'){totalCollected+=bill.total; cntC++;}
+    else if(st==='Quá hạn') cntO++;
+    else cntP++;
+    const otherCell = (bill.otherFees||[]).length ? (bill.otherFees||[]).map(f=>`${f.name}: ${fmtVND(f.amount)}`).join('<br>') : '—';
+    return `<tr>
+      <td><strong>${r.number}</strong></td>
+      <td>${r.tenantName}</td>
+      <td>${fmtVND(r.rent)}</td>
+      <td>${fmtVND(bill.elec)}</td>
+      <td>${fmtVND(bill.water)}</td>
+      <td style="font-size:11.5px;color:var(--muted)">${otherCell}</td>
+      <td><strong>${fmtVND(bill.total)}</strong></td>
+      <td>${statusBadge(st)}</td>
+    </tr>`;
+  }).join('');
+  const net = totalCollected - h.masterRent - (h.opex||0);
+  return `
+    <div class="metrics" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.2rem">
+      <div class="metric up"><div class="metric-icon"><i class="ti ti-circle-check"></i></div>
+        <div class="metric-val">${fmtVND(totalCollected)}</div><div class="metric-label">Đã thu (${cntC} phòng)</div></div>
+      <div class="metric warn"><div class="metric-icon"><i class="ti ti-clock"></i></div>
+        <div class="metric-val">${cntP+cntO} phòng</div><div class="metric-label">Chưa thu / Nợ</div></div>
+      <div class="metric ${net>=0?'up':'down'}"><div class="metric-icon"><i class="ti ti-cash"></i></div>
+        <div class="metric-val">${fmtVND(net)}</div><div class="metric-label">Lợi nhuận ước tính</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="ti ti-table"></i>Chi tiết từng phòng — ${month}</div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Phòng</th><th>Khách thuê</th><th>Tiền phòng</th><th>Điện</th><th>Nước</th><th>Phí khác</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="8" style="text-align:center;color:var(--muted)">Chưa có phòng nào đang thuê</td></tr>'}</tbody>
+      </table></div>
+    </div>
+    <div class="info-box"><i class="ti ti-info-circle"></i><div>Lợi nhuận = Đã thu − Thuê nguyên căn (${fmtVND(h.masterRent)}) − Chi phí vận hành (${fmtVND(h.opex||0)})</div></div>
+  `;
+}
+
+function renderInfoTab(h){
+  const daysLeft = daysUntil(h.leaseEnd);
+  const rooms = [...(h.rooms||[])].sort(naturalSort);
+  const active = rooms.filter(r=>r.status!=='Trống');
+  // Cọc khách thuê: phòng đang thuê LUÔN tính, phòng đã Trống vẫn tính nếu còn giữ cọc (chưa hoàn) — tiền vẫn đang trong tay, không nên biến mất khỏi bảng theo dõi chỉ vì khách đã trả phòng
+  const depositRooms = rooms.filter(r=>r.status!=='Trống' || (r.deposit||0)>0);
+  const totalDeposit = depositRooms.reduce((s,r)=>s+(r.deposit||0),0);
+  return `
+    <div class="report-grid">
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="ti ti-file-text"></i>Hợp đồng thuê nguyên căn</div></div>
+        <div class="card-body">
+          <table><tbody>
+            <tr><td style="color:var(--muted);font-size:12px;width:140px">Chủ nhà</td><td><strong>${h.landlord||'—'}</strong></td></tr>
+            <tr><td style="color:var(--muted);font-size:12px">Bắt đầu</td><td>${fmtDate(h.leaseStart)}</td></tr>
+            <tr><td style="color:var(--muted);font-size:12px">Kết thúc</td><td>${fmtDate(h.leaseEnd)} ${daysLeft!=null?badge(daysLeft+' ngày còn lại',daysLeft<=60?'warn':'up'):''}</td></tr>
+            <tr><td style="color:var(--muted);font-size:12px">Tiền thuê/tháng</td><td><strong>${fmtVND(h.masterRent)}</strong></td></tr>
+            <tr><td style="color:var(--muted);font-size:12px">Đặt cọc</td><td>${fmtVND(h.deposit)}</td></tr>
+            <tr><td style="color:var(--muted);font-size:12px">Chi phí setup</td><td>${fmtVND(h.setupCost)}</td></tr>
+            <tr><td style="color:var(--muted);font-size:12px">Chi phí vận hành</td><td>${fmtVND(h.opex||0)}/tháng</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="ti ti-lock"></i>Tiền cọc khách thuê</div></div>
+        <div class="card-body">
+          <table><tbody>
+            ${depositRooms.map(r=>`<tr><td style="font-size:12px;width:100px">${r.number} — ${r.tenantName||'(đã trả phòng)'}${r.status==='Trống'?` ${badge('Trống, chưa hoàn cọc','warn')}`:''}</td><td>${fmtVND(r.deposit)}</td><td>${statusBadge(r.depositStatus||'Chưa thu')}</td></tr>`).join('')}
+            <tr style="border-top:2px solid var(--border)"><td style="font-size:12px;font-weight:700">Tổng cọc đang giữ</td><td><strong>${fmtVND(totalDeposit)}</strong></td><td></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════
+   ROOM PANEL
+════════════════════════════════════════ */
+let PANEL_HOUSE_ID = null, PANEL_ROOM_ID = null;
+
+function openRoomPanel(houseId, roomId){
+  PANEL_HOUSE_ID = houseId; PANEL_ROOM_ID = roomId;
+  renderRoomPanel();
+  const ov = document.getElementById('roomPanel');
+  ov.classList.add('open');
+  const scroll = document.getElementById('rdp-scroll');
+  if(scroll) scroll.scrollTop = 0;
+  requestAnimationFrame(()=>ov.classList.add('show'));
+}
+function closeRoomPanel(){
+  const ov = document.getElementById('roomPanel');
+  ov.classList.remove('show');
+  setTimeout(()=>ov.classList.remove('open'), 576);
+}
+function renderRoomPanel(){
+  const h = houseById(PANEL_HOUSE_ID);
+  const r = roomById(PANEL_HOUSE_ID, PANEL_ROOM_ID);
+  if(!h||!r) return;
+  const month = thisMonth();
+  const st = r.status==='Trống' ? 'Trống' : getCollectStatus(h.id, r.id, month);
+  const bill = calcRoomBill(h.id, r);
+  document.getElementById('rdp-room-name').textContent = r.number + ' — ' + h.name;
+  document.getElementById('rdp-tenant-name').textContent = r.status==='Trống' ? 'Phòng trống' : r.tenantName;
+
+  const dLeft = daysUntil(r.contractEnd);
+
+  fadeSwap('rdp-scroll', `
+    ${r.status!=='Trống'?`
+    <!-- TRẠNG THÁI THU TIỀN -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="ti ti-coin"></i>Thu tiền tháng ${month}</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div class="status-btns">
+          <button class="status-btn collected ${st==='Đã thu'?'active':''}" onclick="panelSetStatus('Đã thu')"><i class="ti ti-circle-check"></i>Đã thu</button>
+          <button class="status-btn pending ${st==='Chưa thu'?'active':''}" onclick="panelSetStatus('Chưa thu')"><i class="ti ti-clock"></i>Chưa thu</button>
+          <button class="status-btn overdue ${st==='Quá hạn'?'active':''}" onclick="panelSetStatus('Quá hạn')"><i class="ti ti-alert-circle"></i>Quá hạn</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHI PHÍ THÁNG -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="ti ti-receipt"></i>Chi phí tháng ${month}</div></div>
+      <div class="bill-breakdown">
+        <div class="bb-row"><span class="lbl"><i class="ti ti-home"></i>Tiền phòng</span><span class="amt">${fmtVND(r.rent)}</span></div>
+        <div class="bb-row"><span class="lbl"><i class="ti ti-bolt"></i>Điện — chỉ số: ${bill.prev||0} → ${bill.curr||0} (${bill.kwh} kWh × ${fmtVND(bill.price||3500)})</span><span class="amt">${fmtVND(bill.elec)}</span></div>
+        <div class="bb-row"><span class="lbl"><i class="ti ti-droplet"></i>Nước</span><span class="amt">${fmtVND(bill.water)}</span></div>
+        ${(bill.otherFees||[]).map(f=>`<div class="bb-row"><span class="lbl"><i class="ti ti-tag"></i>${f.name}</span><span class="amt">${fmtVND(f.amount)}</span></div>`).join('')}
+        <div class="bb-row bb-total"><span class="lbl"><i class="ti ti-cash"></i>Tổng phải thu</span><span class="amt">${fmtVND(bill.total)}</span></div>
+      </div>
+      <div class="card-body" style="padding-top:.75rem">
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="openEditElectricModal('${h.id}','${r.id}')"><i class="ti ti-bolt"></i> Cập nhật chỉ số điện</button>
+      </div>
+    </div>
+
+    <!-- THÔNG TIN KHÁCH -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-user"></i>Thông tin khách thuê</div>
+        <button class="btn btn-ghost btn-sm" onclick="openEditRoomModal('${h.id}','${r.id}')"><i class="ti ti-pencil"></i>Sửa</button>
+      </div>
+      <div class="card-body">
+        <table><tbody>
+          <tr><td style="color:var(--muted);font-size:12px;width:120px">Họ tên</td><td><strong>${r.tenantName}</strong></td></tr>
+          <tr><td style="color:var(--muted);font-size:12px">Điện thoại</td><td>${r.phone||'—'}</td></tr>
+          <tr><td style="color:var(--muted);font-size:12px">Trạng thái</td><td>${statusBadge(r.status)}</td></tr>
+          <tr><td style="color:var(--muted);font-size:12px">Ngày vào</td><td>${fmtDate(r.contractStart)}</td></tr>
+          <tr><td style="color:var(--muted);font-size:12px">Hết HĐ</td><td>${fmtDate(r.contractEnd)} ${dLeft!=null?badge(dLeft<0?'Đã hết hạn':dLeft+' ngày còn',dLeft<0?'down':dLeft<60?'warn':'up'):''}</td></tr>
+          <tr><td style="color:var(--muted);font-size:12px">Tiền cọc</td><td>${fmtVND(r.deposit)} — ${statusBadge(r.depositStatus||'Chưa thu')}</td></tr>
+          ${r.note?`<tr><td style="color:var(--muted);font-size:12px">Ghi chú</td><td>${r.note}</td></tr>`:''}
+        </tbody></table>
+      </div>
+    </div>`
+    :`<!-- PHÒNG TRỐNG -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="ti ti-door-off"></i>Phòng trống</div></div>
+      <div class="card-body">
+        <p style="color:var(--muted);font-size:13px;margin-bottom:1rem">Phòng này chưa có khách thuê. Bấm "Thêm khách" để nhập thông tin.</p>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeRoomPanel();openEditRoomModal('${h.id}','${r.id}')"><i class="ti ti-user-plus"></i>Thêm khách thuê</button>
+      </div>
+    </div>`}
+
+  `);
+
+  // Đặt footer ngoài scroll
+  document.getElementById('rdp-footer').innerHTML = `
+    <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="openEditRoomModal('${h.id}','${r.id}')"><i class="ti ti-pencil"></i>Sửa phòng</button>
+    <button class="btn btn-danger btn-sm" onclick="confirmDeleteRoom('${h.id}','${r.id}')"><i class="ti ti-trash"></i>Xóa</button>
+  `;
+}
+
+function panelSetStatus(status){
+  const month = thisMonth();
+  const r = roomById(PANEL_HOUSE_ID, PANEL_ROOM_ID);
+  const bill = r ? calcRoomBill(PANEL_HOUSE_ID, r) : null;
+  setCollectStatus(PANEL_HOUSE_ID, PANEL_ROOM_ID, month, status, bill?bill.total:null);
+  // Bill/thông tin khách không đổi khi chỉ đổi trạng thái thu tiền — chỉ cần bật/tắt class
+  // "active" trên đúng 3 nút trạng thái trong panel, không cần render lại cả panel.
+  const btns = document.querySelectorAll('#rdp-scroll .status-btns .status-btn');
+  const map = {0:'Đã thu',1:'Chưa thu',2:'Quá hạn'};
+  btns.forEach((b,i)=>b.classList.toggle('active', map[i]===status));
+  // Cập nhật tại chỗ đúng room-card phía sau panel (nếu lưới phòng đang hiển thị trên DOM);
+  // không gọi renderDetailTab() để tránh fade lại toàn bộ lưới phòng.
+  updateRoomCard(PANEL_HOUSE_ID, PANEL_ROOM_ID);
+  toast(`Đã đánh dấu "${status}"`, status==='Đã thu'?'ti-circle-check':status==='Quá hạn'?'ti-alert-circle':'ti-clock',
+    status==='Đã thu'?'var(--up)':status==='Quá hạn'?'var(--down)':'var(--warn)');
+}
+
+function quickCollect(hId, rId, month, currentStatus){
+  const next = currentStatus==='Đã thu'?'Chưa thu':'Đã thu';
+  const r = roomById(hId, rId);
+  const bill = r ? calcRoomBill(hId, r) : null;
+  setCollectStatus(hId, rId, month, next, bill?bill.total:null);
+  // Chỉ cập nhật tại chỗ đúng 1 room-card bị đổi; các phòng khác trong lưới không bị fade lại.
+  // Fallback renderDetailTab() chỉ chạy nếu vì lý do gì đó không tìm thấy card trên DOM (an toàn).
+  if(!updateRoomCard(hId, rId)) renderDetailTab(hId);
+  toast(next==='Đã thu'?'Đã đánh dấu thu tiền':'Đã bỏ đánh dấu', next==='Đã thu'?'ti-circle-check':'ti-circle', next==='Đã thu'?'var(--up)':'var(--muted)');
+}
+
+/* ════════════════════════════════════════
+   COLLECT PAGE
+════════════════════════════════════════ */
+function onCollectMonthChange(val){
+  COLLECT_MONTH = val;
+  renderCollect();
+}
+// Tính tổng hợp số liệu thu tiền cho 1 tháng — dùng chung giữa renderCollect() (vẽ lần đầu)
+// và collectSet() (cập nhật tại chỗ) để không lặp/lệch logic.
+function computeCollectAggregates(month){
+  let totalC=0,totalP=0,totalO=0,amtC=0,amtP=0,amtO=0;
+  const perHouse={};
+  DB.houses.forEach(h=>{
+    let cntC=0, cnt=0;
+    (h.rooms||[]).forEach(r=>{
+      if(!roomActiveForMonth(h.id,r,month)) return;
+      cnt++;
+      const st=getCollectStatus(h.id,r.id,month);
+      const b=calcRoomBillForMonth(h.id, r, month);
+      if(st==='Đã thu'){totalC++;amtC+=b.total;cntC++;}
+      else if(st==='Quá hạn'){totalO++;amtO+=b.total;}
+      else{totalP++;amtP+=b.total;}
+    });
+    perHouse[h.id]={cntC, total:cnt};
+  });
+  return {totalC,totalP,totalO,amtC,amtP,amtO,perHouse};
+}
+function collectInfoBoxHTML(month, agg){
+  const isClosed = agg.totalC>0 && agg.totalP===0 && agg.totalO===0;
+  const isPastMonth = month!==thisMonth();
+  return `
+    ${isPastMonth?`<div class="info-box" style="margin-top:0;margin-bottom:1.2rem"><i class="ti ti-history"></i><div>Đang xem tháng <strong>${month}</strong> (dữ liệu quá khứ) — số tiền tính theo chỉ số điện đã ghi nhận tại tháng đó.</div></div>`:''}
+    ${isClosed
+      ?`<div class="info-box" style="background:var(--up-soft);border-color:var(--up-border);color:var(--up);margin-top:0;margin-bottom:1.2rem"><i class="ti ti-circle-check"></i><div>Kỳ <strong>${month}</strong> đã đóng sổ — đã thu đủ ${agg.totalC}/${agg.totalC} phòng.</div></div>`
+      :`<div class="info-box" style="margin-top:0;margin-bottom:1.2rem"><i class="ti ti-clock"></i><div>Kỳ <strong>${month}</strong> chưa đóng sổ — còn ${agg.totalP+agg.totalO}/${agg.totalC+agg.totalP+agg.totalO} phòng chưa thu xong.</div></div>`
+    }`;
+}
+function renderCollect(){
+  // Danh sách tháng = union các tháng có data trong collectStatus/electricHistory + luôn có tháng hiện tại, mới nhất lên trên
+  const monthSet = new Set([thisMonth()]);
+  Object.keys(DB.collectStatus||{}).forEach(k=>{ const m=k.split('_').pop(); if(/^\d{4}-\d{2}$/.test(m)) monthSet.add(m); });
+  Object.keys(DB.electricHistory||{}).forEach(k=>{ const m=k.split('_').pop(); if(/^\d{4}-\d{2}$/.test(m)) monthSet.add(m); });
+  const monthList = [...monthSet].sort().reverse();
+  if(!COLLECT_MONTH || !monthSet.has(COLLECT_MONTH)) COLLECT_MONTH = monthList[0] || thisMonth();
+  const month = COLLECT_MONTH;
+  const sel = document.getElementById('collect-month-select');
+  if(sel) sel.innerHTML = monthList.map(m=>`<option value="${m}" ${m===month?'selected':''}>${m}${m===thisMonth()?' (tháng này)':''}</option>`).join('');
+  const el = document.getElementById('collect-content');
+  const billingDay = (DB.admin && DB.admin.billingDay) || 1;
+  const noteEl = document.getElementById('collect-billing-note');
+  if(noteEl) noteEl.textContent = billingDay>1 ? ` · Kỳ thu tính từ ngày ${billingDay} hàng tháng` : '';
+
+  if(!DB.houses.length){
+    el.innerHTML=`<div class="empty"><i class="ti ti-building-warehouse"></i><h3>Chưa có nhà nào</h3><p>Thêm nhà trước để quản lý thu tiền</p></div>`;
+    return;
+  }
+
+  const agg = computeCollectAggregates(month);
+
+  const houses = DB.houses.map(h=>{
+    const active=[...(h.rooms||[])].sort(naturalSort).filter(r=>roomActiveForMonth(h.id,r,month));
+    const rows = active.map(r=>{
+      const st=getCollectStatus(h.id,r.id,month);
+      const bill=calcRoomBillForMonth(h.id, r, month);
+      const displayTenant = r.status==='Trống' ? (DB.electricHistory?.[collectKey(h.id,r.id,month)]?.tenant || r.tenantName || '(đã trả phòng)') : r.tenantName;
+      return `<div class="crow" id="crow_${h.id}_${r.id}" style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border2)">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13.5px">${r.number} <span style="color:var(--text2);font-weight:600">${displayTenant}</span></div>
+          <div style="font-size:11.5px;color:var(--muted)">Tổng: ${fmtVND(bill.total)} (phòng ${fmtVND(r.rent)} + điện ${fmtVND(bill.elec)} + nước ${fmtVND(bill.water)}${(bill.otherFees||[]).map(f=>` + ${f.name} ${fmtVND(f.amount)}`).join('')})</div>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="btn btn-sm ${st==='Đã thu'?'btn-up':'btn-outline'}" onclick="collectSet('${h.id}','${r.id}','${month}','Đã thu')"><i class="ti ti-circle-check"></i>Đã thu</button>
+          <button class="btn btn-sm ${st==='Chưa thu'?'btn-warn':'btn-outline'}" onclick="collectSet('${h.id}','${r.id}','${month}','Chưa thu')">Chưa thu</button>
+          <button class="btn btn-sm ${st==='Quá hạn'?'btn-danger':'btn-outline'}" onclick="collectSet('${h.id}','${r.id}','${month}','Quá hạn')"><i class="ti ti-alert-circle"></i>Nợ</button>
+        </div>
+      </div>`;
+    }).join('');
+    const cntC = agg.perHouse[h.id]?.cntC || 0;
+    return `<div class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-building-warehouse"></i>${h.name}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;font-weight:700;color:var(--text2)" id="hcnt_${h.id}">Đã thu ${cntC}/${active.length}</span>
+          <button class="btn btn-outline btn-sm" onclick="collectAllHouse('${h.id}','${month}')"><i class="ti ti-checks"></i>Đánh dấu tất cả</button>
+        </div>
+      </div>
+      <div style="padding:.75rem 1.2rem">${rows||'<div style="color:var(--muted);font-size:13px;padding:.5rem 0">Không có phòng nào đang thuê</div>'}</div>
+    </div>`;
+  }).join('');
+
+  fadeSwap(el, `
+    <div id="collect-infobox">${collectInfoBoxHTML(month, agg)}</div>
+    <div class="metrics" id="collect-metrics" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.2rem">
+      <div class="metric up"><div class="metric-icon"><i class="ti ti-circle-check"></i></div>
+        <div class="metric-val" id="cm-amtC">${fmtVND(agg.amtC)}</div><div class="metric-label" id="cm-lblC">Đã thu (${agg.totalC} phòng)</div></div>
+      <div class="metric warn"><div class="metric-icon"><i class="ti ti-clock"></i></div>
+        <div class="metric-val" id="cm-amtP">${fmtVND(agg.amtP)}</div><div class="metric-label" id="cm-lblP">Chưa thu (${agg.totalP} phòng)</div></div>
+      <div class="metric ${agg.totalO>0?'down':'neutral'}" id="cm-metricO"><div class="metric-icon"><i class="ti ti-alert-circle"></i></div>
+        <div class="metric-val" id="cm-amtO">${fmtVND(agg.amtO)}</div><div class="metric-label" id="cm-lblO">Nợ quá hạn (${agg.totalO} phòng)</div></div>
+      <div class="metric ${(agg.amtP+agg.amtO)>0?'down':'up'}" id="cm-metricR"><div class="metric-icon"><i class="ti ti-cash"></i></div>
+        <div class="metric-val" id="cm-amtR">${fmtVND(agg.amtP+agg.amtO)}</div><div class="metric-label">Tổng còn phải thu</div></div>
+    </div>
+    ${houses}
+  `);
+}
+
+// Cập nhật lại 4 ô metric tổng + màu sắc cho đúng số liệu mới nhất (không fade lại cả khối).
+function updateCollectMetrics(month, agg){
+  const set = (id, val) => { const e=document.getElementById(id); if(e) e.textContent = val; };
+  set('cm-amtC', fmtVND(agg.amtC));
+  set('cm-lblC', `Đã thu (${agg.totalC} phòng)`);
+  set('cm-amtP', fmtVND(agg.amtP));
+  set('cm-lblP', `Chưa thu (${agg.totalP} phòng)`);
+  set('cm-amtO', fmtVND(agg.amtO));
+  set('cm-lblO', `Nợ quá hạn (${agg.totalO} phòng)`);
+  set('cm-amtR', fmtVND(agg.amtP+agg.amtO));
+  const mO = document.getElementById('cm-metricO');
+  if(mO) mO.className = 'metric ' + (agg.totalO>0?'down':'neutral');
+  const mR = document.getElementById('cm-metricR');
+  if(mR) mR.className = 'metric ' + ((agg.amtP+agg.amtO)>0?'down':'up');
+  const infoBox = document.getElementById('collect-infobox');
+  if(infoBox) infoBox.innerHTML = collectInfoBoxHTML(month, agg);
+}
+
+function collectSet(hId, rId, month, status){
+  const r = roomById(hId, rId);
+  const bill = r ? calcRoomBillForMonth(hId, r, month) : null;
+  setCollectStatus(hId, rId, month, status, bill?bill.total:null);
+
+  // Nếu trang Thu tiền đang hiển thị đúng tháng này trên DOM → chỉ cập nhật tại chỗ
+  // (nút trạng thái của dòng, bộ đếm "Đã thu X/Y" của nhà, và 4 ô metric tổng).
+  // Không gọi lại renderCollect() để tránh fade lại toàn bộ trang.
+  const row = document.getElementById(`crow_${hId}_${rId}`);
+  if(row && COLLECT_MONTH===month){
+    const btns = row.querySelectorAll('button');
+    const cfg = [['Đã thu','btn-up'],['Chưa thu','btn-warn'],['Quá hạn','btn-danger']];
+    btns.forEach((b,i)=>{
+      const [st,cls]=cfg[i];
+      b.classList.toggle(cls, st===status);
+      b.classList.toggle('btn-outline', st!==status);
+    });
+    row.classList.add('flash-update');
+    setTimeout(()=>row.classList.remove('flash-update'), 780);
+
+    const h = houseById(hId);
+    if(h){
+      const active=(h.rooms||[]).filter(rr=>roomActiveForMonth(hId,rr,month));
+      const cntC = active.filter(rr=>getCollectStatus(hId,rr.id,month)==='Đã thu').length;
+      const hc = document.getElementById(`hcnt_${hId}`);
+      if(hc) hc.textContent = `Đã thu ${cntC}/${active.length}`;
+    }
+
+    updateCollectMetrics(month, computeCollectAggregates(month));
+  } else {
+    renderCollect();
+  }
+
+  toast(status==='Đã thu'?'Đã đánh dấu thu':'Đã cập nhật trạng thái',
+    status==='Đã thu'?'ti-circle-check':'ti-refresh',
+    status==='Đã thu'?'var(--up)':status==='Quá hạn'?'var(--down)':'var(--muted)');
+}
+function collectAllHouse(hId, month){
+  const h = houseById(hId);
+  (h.rooms||[]).filter(r=>r.status!=='Trống').forEach(r=>{
+    const bill = calcRoomBillForMonth(hId, r, month);
+    DB.collectStatus[collectKey(hId,r.id,month)]='Đã thu';
+    if(!DB.collectHistory) DB.collectHistory={};
+    DB.collectHistory[collectKey(hId,r.id,month)] = bill.total;
+  });
+  saveDB();
+  renderCollect();
+  toast('Đã đánh dấu tất cả đã thu — '+h.name,'ti-checks','var(--up)');
+}
+
+/* ════════════════════════════════════════
+   MAINTENANCE
+════════════════════════════════════════ */
+function renderMaintenance(){
+  const el = document.getElementById('maint-content');
+  if(!DB.maintenance||!DB.maintenance.length){
+    el.innerHTML=`<div class="empty"><i class="ti ti-tool"></i><h3>Chưa có việc sửa chữa nào</h3><p>Bấm "Thêm việc" để ghi nhận</p></div>`;
+    updateBadges(); return;
+  }
+  const pending = DB.maintenance.filter(m=>m.status!=='Đã xong');
+  const rows = DB.maintenance.map(m=>{
+    const h = houseById(m.houseId);
+    return `<tr>
+      <td>${h?h.name:'—'}</td>
+      <td>${m.room||'—'}</td>
+      <td><strong>${m.title}</strong>${m.desc?`<div style="font-size:11px;color:var(--muted)">${m.desc}</div>`:''}</td>
+      <td>${statusBadge(m.status)}</td>
+      <td>${fmtDate(m.createdAt)}</td>
+      <td>${m.cost?fmtVND(m.cost):'—'}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-sm" onclick="openEditMaintModal('${m.id}')"><i class="ti ti-pencil"></i></button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--down)" onclick="deleteMaint('${m.id}')"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  fadeSwap(el, `
+    <div class="metrics" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.2rem">
+      <div class="metric"><div class="metric-icon"><i class="ti ti-tool"></i></div><div class="metric-val">${DB.maintenance.length}</div><div class="metric-label">Tổng việc</div></div>
+      <div class="metric ${pending.length>0?'warn':'up'}"><div class="metric-icon"><i class="ti ti-clock"></i></div><div class="metric-val">${pending.length}</div><div class="metric-label">Chưa xong</div></div>
+      <div class="metric"><div class="metric-icon"><i class="ti ti-cash"></i></div><div class="metric-val">${fmtVND(DB.maintenance.filter(m=>m.status==='Đã xong').reduce((s,m)=>s+(m.cost||0),0))}</div><div class="metric-label">Tổng chi phí đã xong</div></div>
+    </div>
+    <div class="card"><div class="table-wrap"><table>
+      <thead><tr><th>Nhà</th><th>Phòng</th><th>Nội dung</th><th>Trạng thái</th><th>Ngày tạo</th><th>Chi phí</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div></div>
+  `);
+  updateBadges();
+}
+
+function openAddMaintModal(){ openMaintModal(null); }
+function openEditMaintModal(id){ openMaintModal(id); }
+function openMaintModal(editId){
+  const m = editId ? DB.maintenance.find(x=>x.id===editId) : null;
+  const hOptions = DB.houses.map(h=>`<option value="${h.id}" ${m&&m.houseId===h.id?'selected':''}>${h.name}</option>`).join('');
+  openModal(`<i class="ti ti-tool"></i>${m?'Sửa việc bảo trì':'Thêm việc sửa chữa'}`,`
+    <div class="form-grid">
+      <div class="fg full"><label>Chọn nhà *</label><select id="mt-house">${hOptions}</select></div>
+      <div class="fg"><label>Phòng</label><input type="text" id="mt-room" value="${m?m.room||'':''}" placeholder="VD: P01 hoặc Chung"></div>
+      <div class="fg"><label>Ngày ghi nhận</label><input type="date" id="mt-date" value="${m?m.createdAt:todayStr()}"></div>
+      <div class="fg full"><label>Nội dung *</label><input type="text" id="mt-title" value="${m?m.title:''}" placeholder="VD: Thay vòi nước phòng tắm" required></div>
+      <div class="fg full"><label>Mô tả chi tiết</label><textarea id="mt-desc">${m?m.desc||'':''}</textarea></div>
+      <div class="fg"><label>Trạng thái</label><select id="mt-status">
+        ${['Chưa làm','Đang làm','Đã xong'].map(s=>`<option ${m&&m.status===s?'selected':''}>${s}</option>`).join('')}
+      </select></div>
+      <div class="fg"><label>Chi phí (VNĐ)</label><input type="text" inputmode="numeric" id="mt-cost" value="${m?m.cost||'':''}" placeholder="0"></div>
+      <div class="fg full"><label>Người thực hiện</label><input type="text" id="mt-assignee" value="${m?m.assignee||'':''}" placeholder="Tên thợ hoặc tự làm"></div>
+    </div>
+    <div class="modal-footer">
+      ${m?`<button class="btn btn-danger" onclick="deleteMaint('${m.id}')"><i class="ti ti-trash"></i>Xóa</button>`:''}
+      <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="submitMaint(${m?`'${m.id}'`:'null'})"><i class="ti ti-check"></i>${m?'Lưu':'Thêm'}</button>
+    </div>
+  `);
+}
+function submitMaint(editId){
+  const v=id=>document.getElementById(id)?.value||'';
+  if(!v('mt-title').trim()){ toast('Vui lòng nhập nội dung','ti-alert-circle','var(--down)'); return; }
+  const newStatus = v('mt-status');
+  const old = editId ? DB.maintenance.find(x=>x.id===editId) : null;
+  // Chỉ set completedAt khi trạng thái MỚI chuyển sang "Đã xong" (khác trạng thái cũ) — sửa lại nội dung/chi phí của việc đã xong không được ghi đè mất ngày hoàn thành thực tế
+  let completedAt = old?.completedAt || '';
+  if(newStatus==='Đã xong' && old?.status!=='Đã xong') completedAt = todayStr();
+  else if(newStatus!=='Đã xong') completedAt = '';
+  const entry = {houseId:v('mt-house'),room:v('mt-room'),title:v('mt-title'),desc:v('mt-desc'),
+    status:newStatus,cost:readNum('mt-cost'),assignee:v('mt-assignee'),createdAt:v('mt-date'),completedAt};
+  if(editId){ Object.assign(DB.maintenance.find(x=>x.id===editId),entry); }
+  else { DB.maintenance.push({id:nextId(),...entry}); }
+  saveDB(); closeModal(); renderMaintenance();
+  toast(editId?'Đã cập nhật':'Đã thêm việc sửa chữa','ti-circle-check','var(--up)');
+}
+function deleteMaint(id){
+  DB.maintenance = DB.maintenance.filter(x=>x.id!==id);
+  saveDB(); closeModal(); renderMaintenance();
+  toast('Đã xóa việc sửa chữa','ti-trash','var(--down)');
+}
+
+/* ════════════════════════════════════════
+   REPORT
+════════════════════════════════════════ */
+function onReportMonthChange(val){
+  REPORT_MONTH = val;
+  renderReport();
+}
+function renderReport(){
+  // Thu thập tất cả tháng có dữ liệu (điện hoặc thu tiền) + luôn có tháng hiện tại
+  const monthSet = new Set([thisMonth()]);
+  Object.keys(DB.electricHistory||{}).forEach(k=>{ const m=k.split('_').pop(); if(/^\d{4}-\d{2}$/.test(m)) monthSet.add(m); });
+  Object.keys(DB.collectStatus||{}).forEach(k=>{ const m=k.split('_').pop(); if(/^\d{4}-\d{2}$/.test(m)) monthSet.add(m); });
+  const monthList = [...monthSet].sort().reverse();
+  if(!REPORT_MONTH || !monthSet.has(REPORT_MONTH)) REPORT_MONTH = monthList[0] || thisMonth();
+  const month = REPORT_MONTH;
+  const isCurrentMonth = month===thisMonth();
+
+  let totalRevenue=0, totalCollected=0, totalMasterRent=0, totalOpex=0, totalSetup=0, totalDeposit=0, totalTenantDeposit=0;
+  const houseStats = DB.houses.map(h=>{
+    const active=(h.rooms||[]).filter(r=>r.status!=='Trống'); // lấp đầy/cọc hiện đang giữ — phản ánh trạng thái sống, không theo tháng đang xem
+    const billedRooms=(h.rooms||[]).filter(r=>roomActiveForMonth(h.id,r,month)); // phòng tính doanh thu/đã thu cho đúng tháng đang xem
+    let rev=0, coll=0;
+    billedRooms.forEach(r=>{
+      const b = isCurrentMonth ? calcRoomBill(h.id, r) : calcRoomBillForMonth(h.id, r, month);
+      rev+=b.total;
+      if(getCollectStatus(h.id,r.id,month)==='Đã thu') coll+=b.total;
+    });
+    const net = coll - h.masterRent - (h.opex||0);
+    const occRate = (h.rooms||[]).length ? Math.round(active.length/(h.rooms||[]).length*100) : 0;
+    const tenantDeposit = (h.rooms||[]).filter(r=>r.status!=='Trống' || (r.deposit||0)>0).reduce((s,r)=>s+(r.deposit||0),0);
+    totalRevenue+=rev; totalCollected+=coll; totalMasterRent+=h.masterRent; totalOpex+=(h.opex||0); totalSetup+=(h.setupCost||0); totalDeposit+=(h.deposit||0); totalTenantDeposit+=tenantDeposit;
+    return {h, rev, coll, net, occRate};
+  });
+  const sortedStats = [...houseStats].sort((a,b)=>b.net-a.net);
+  const houseRows = sortedStats.map((s,idx)=>{
+    const {h, rev, coll, net, occRate} = s;
+    const isBest = idx===0 && sortedStats.length>1;
+    const isWorst = idx===sortedStats.length-1 && sortedStats.length>1;
+    return `<tr>
+      <td><strong>${h.name}</strong> ${isBest?badge('Tốt nhất','up'):isWorst?badge('Cần chú ý','down'):''}</td>
+      <td>${fmtVND(rev)}</td>
+      <td>${fmtVND(coll)}</td>
+      <td>${fmtVND(h.masterRent)}</td>
+      <td>${fmtVND(h.opex||0)}</td>
+      <td>${occRate}%</td>
+      <td><strong style="color:${net>=0?'var(--up)':'var(--down)'}">${fmtVND(net)}</strong></td>
+    </tr>`;
+  }).join('');
+  const totalNet = totalCollected - totalMasterRent - totalOpex;
+  const totalCapital = totalSetup + totalDeposit;
+  const roi = totalCapital>0?(totalNet*12/totalCapital*100):null;
+  const roiStr = roi===null ? 'N/A' : roi.toFixed(1)+'%';
+  const roiClass = roi===null ? 'accent' : (roi>=0 ? 'up' : 'down');
+  const totalOperatingCost = totalMasterRent + totalOpex;
+  const opMargin = totalOperatingCost>0 ? (totalNet/totalOperatingCost*100) : null;
+  const opMarginStr = opMargin===null ? 'N/A' : opMargin.toFixed(1)+'%';
+  const opMarginClass = opMargin===null ? 'accent' : (opMargin>=0 ? 'up' : 'down');
+
+  const monthOptions = monthList.map(m=>`<option value="${m}" ${m===month?'selected':''}>${m}${m===thisMonth()?' (tháng này)':''}</option>`).join('');
+
+  fadeSwap('report-content', `
+    <div class="sec-hd" style="margin-bottom:1rem">
+      <div><div class="sec-title" style="font-size:15px">Dòng tiền & Báo cáo</div><div class="sec-sub">Chọn tháng để xem lại báo cáo các kỳ trước</div></div>
+      <select onchange="onReportMonthChange(this.value)" style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;border:1.5px solid var(--border);border-radius:var(--r);padding:7px 11px;background:var(--surface);outline:none;color:var(--text);cursor:pointer">
+        ${monthOptions}
+      </select>
+    </div>
+    ${!isCurrentMonth?`<div class="info-box" style="margin-bottom:1.2rem;background:var(--accent-soft);border-color:var(--accent-border)"><i class="ti ti-history"></i><div>Đang xem báo cáo tháng <strong>${month}</strong> (dữ liệu quá khứ) — Doanh thu tiềm năng tính theo chỉ số điện đã ghi nhận tại tháng đó.</div></div>`:''}
+    <div class="metrics" style="margin-bottom:1.5rem">
+      <div class="metric up"><div class="metric-icon"><i class="ti ti-cash"></i></div><div class="metric-val">${fmtVND(totalCollected)}</div><div class="metric-label">Tổng đã thu tháng ${month}</div></div>
+      <div class="metric down"><div class="metric-icon"><i class="ti ti-receipt"></i></div><div class="metric-val">${fmtVND(totalMasterRent+totalOpex)}</div><div class="metric-label">Tổng chi phí</div></div>
+      <div class="metric ${totalNet>=0?'up':'down'}"><div class="metric-icon"><i class="ti ti-cash"></i></div><div class="metric-val">${fmtVND(totalNet)}</div><div class="metric-label">Lợi nhuận thuần</div></div>
+      <div class="metric ${opMarginClass}"><div class="metric-icon"><i class="ti ti-chart-bar"></i></div><div class="metric-val">${opMarginStr}</div><div class="metric-label">Tỷ suất LN / chi phí vận hành</div></div>
+      <div class="metric ${roiClass}"><div class="metric-icon"><i class="ti ti-percentage"></i></div><div class="metric-val">${roiStr}</div><div class="metric-label">ROI/năm trên vốn đầu tư</div></div>
+    </div>
+    <div class="card" style="margin-bottom:1.2rem">
+      <div class="card-header"><div class="card-title"><i class="ti ti-table"></i>Tổng kết theo nhà — ${month}</div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nhà</th><th>Doanh thu tiềm năng</th><th>Đã thu thực tế</th><th>Thuê nguyên căn</th><th>Chi phí vận hành</th><th>Lấp đầy</th><th>Lợi nhuận</th></tr></thead>
+        <tbody>${houseRows||'<tr><td colspan="7" style="text-align:center;color:var(--muted)">Chưa có dữ liệu</td></tr>'}</tbody>
+        <tfoot><tr>
+          <td style="color:var(--accent)">Tổng cộng</td><td>${fmtVND(totalRevenue)}</td><td>${fmtVND(totalCollected)}</td>
+          <td>${fmtVND(totalMasterRent)}</td><td>${fmtVND(totalOpex)}</td><td></td>
+          <td style="color:${totalNet>=0?'var(--up)':'var(--down)'}">${fmtVND(totalNet)}</td>
+        </tr></tfoot>
+      </table></div>
+    </div>
+    <div class="note-block" id="report-note-block" style="margin-bottom:1.2rem">
+      <div class="note-toggle" onclick="toggleNoteBlock('report-note-block')">
+        <i class="ti ti-info-circle"></i>Giải thích cách tính các chỉ số
+        <i class="ti ti-chevron-down note-chevron"></i>
+      </div>
+      <div class="note-body">
+      <div class="note-row"><i class="ti ti-cash"></i><div>Lợi nhuận = Đã thu thực tế − Tiền thuê nguyên căn − Chi phí vận hành</div></div>
+      <div class="note-row"><i class="ti ti-chart-bar"></i><div>Tỷ suất LN/chi phí vận hành = Lợi nhuận tháng / (Thuê nguyên căn + Chi phí vận hành) × 100 — đo hiệu quả vận hành hàng tháng, nên xem chỉ số này thường xuyên</div></div>
+      <div class="note-row"><i class="ti ti-percentage"></i><div>ROI/năm trên vốn đầu tư = (Lợi nhuận tháng × 12) / (Setup ${fmtVND(totalSetup)} + Cọc ${fmtVND(totalDeposit)}) × 100 — đo hiệu quả của số vốn bỏ ra một lần ban đầu, dùng để so sánh với gửi tiết kiệm/đầu tư khác, không phải chỉ số xem hàng ngày</div></div>
+      <div class="note-row"><i class="ti ti-eye"></i><div>Doanh thu tiềm năng = tổng tiền nếu tất cả phòng đang thuê đều đã thu đủ tháng này${!isCurrentMonth?' (tính theo chỉ số điện đã ghi nhận của tháng đó)':''}</div></div>
+      <div class="note-row"><i class="ti ti-lock"></i><div>Tiền cọc (cả 2 loại) KHÔNG được tính vào Lợi nhuận vì là tiền giữ tạm/phải hoàn trả sau, chỉ hiển thị riêng ở mục "Tình hình tiền cọc" để theo dõi dòng tiền thực tế đang giữ</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1.2rem">
+      <div class="card-header"><div class="card-title"><i class="ti ti-lock"></i>Tình hình tiền cọc (toàn bộ ${DB.houses.length} nhà)</div></div>
+      <div class="card-body">
+        <table><tbody>
+          <tr><td style="color:var(--muted);font-size:12px">Cọc khách thuê đang giữ</td><td><strong>${fmtVND(totalTenantDeposit)}</strong></td></tr>
+          <tr><td style="color:var(--muted);font-size:12px">Cọc đã đặt cho chủ nhà (nguyên căn)</td><td><strong>${fmtVND(totalDeposit)}</strong></td></tr>
+          <tr style="border-top:2px solid var(--border)"><td style="font-size:12px;font-weight:700">Cọc ròng đang có trong tay</td>
+            <td><strong style="color:${(totalTenantDeposit-totalDeposit)>=0?'var(--up)':'var(--down)'}">${fmtVND(totalTenantDeposit-totalDeposit)}</strong></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  `);
+}
+
+/* ════════════════════════════════════════
+   ADD/EDIT HOUSE
+════════════════════════════════════════ */
+function openAddHouseModal(){ openHouseModal(null); }
+function openEditHouseModal(id){ openHouseModal(id); }
+function openHouseModal(editId){
+  const h = editId ? houseById(editId) : null;
+  const v = (f,d='')=>h?(h[f]??d):d;
+  openModal(`<i class="ti ti-building-warehouse"></i>${h?'Chỉnh sửa thông tin nhà':'Thêm nhà mới'}`,`
+    <div class="form-grid">
+      <div class="fg full"><label>Tên nhà *</label><input type="text" id="h-name" value="${v('name')}" placeholder="VD: Nhà trọ Hoàng Mai" required></div>
+      <div class="fg full"><label>Địa chỉ</label><input type="text" id="h-addr" value="${v('address')}" placeholder="Số nhà, Phường/Xã, Tỉnh/Thành phố"></div>
+      <div class="fg"><label>Chủ nhà (người cho thuê nguyên căn)</label><input type="text" id="h-landlord" value="${v('landlord')}" placeholder="Tên chủ nhà"></div>
+      <div class="fg"><label>Tiền thuê nguyên căn/tháng (VNĐ)</label><input type="text" inputmode="numeric" id="h-rent" value="${v('masterRent',0)}"></div>
+      <div class="fg"><label>Đặt cọc (VNĐ)</label><input type="text" inputmode="numeric" id="h-deposit" value="${v('deposit',0)}"></div>
+      <div class="fg"><label>Chi phí setup ban đầu (VNĐ)</label><input type="text" inputmode="numeric" id="h-setup" value="${v('setupCost',0)}"></div>
+      <div class="fg"><label>Chi phí vận hành/tháng (VNĐ)</label><input type="text" inputmode="numeric" id="h-opex" value="${v('opex',0)}"></div>
+      <div class="fg"><label>Bắt đầu hợp đồng</label><input type="date" id="h-start" value="${v('leaseStart')}"></div>
+      <div class="fg"><label>Kết thúc hợp đồng</label><input type="date" id="h-end" value="${v('leaseEnd')}"></div>
+      ${!h?`<div class="fg full"><label>Số phòng ban đầu</label><input type="number" id="h-roomcount" min="1" max="30" value="6" placeholder="Số phòng tự động tạo"></div>`:''}
+    </div>
+    <div class="modal-footer">
+      ${h?`<button class="btn btn-danger" onclick="deleteHouse('${h.id}')"><i class="ti ti-trash"></i>Xóa nhà</button>`:''}
+      <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="submitHouse(${h?`'${h.id}'`:'null'})"><i class="ti ti-check"></i>${h?'Lưu':'Thêm nhà'}</button>
+    </div>
+  `);
+}
+function submitHouse(editId){
+  const v=id=>document.getElementById(id)?.value||'';
+  if(!v('h-name').trim()){ toast('Vui lòng nhập tên nhà','ti-alert-circle','var(--down)'); return; }
+  const entry={name:v('h-name'),address:v('h-addr'),landlord:v('h-landlord'),
+    masterRent:readNum('h-rent'),deposit:readNum('h-deposit'),setupCost:readNum('h-setup'),
+    opex:readNum('h-opex'),leaseStart:v('h-start'),leaseEnd:v('h-end')};
+  if(editId){ Object.assign(houseById(editId),entry); }
+  else {
+    const newHouse={id:nextId(),...entry,rooms:[]};
+    DB.houses.push(newHouse);
+    const roomCount=parseInt(document.getElementById('h-roomcount')?.value)||0;
+    for(let i=1;i<=roomCount;i++){
+      newHouse.rooms.push({id:nextId(), number:'P'+String(i).padStart(2,'0'), status:'Trống', tenantName:'', phone:'', rent:0, electric:{prev:0,curr:0,price:3500}, water:0, contractStart:'', contractEnd:'', deposit:0, depositStatus:'Chưa thu', note:'', otherFees:[]});
+    }
+  }
+  saveDB(); closeModal();
+  if(CURRENT_SECTION==='house-detail') renderHouseDetail(editId||DB.houses[DB.houses.length-1].id);
+  else renderSection(CURRENT_SECTION==='house-detail'?'home':CURRENT_SECTION);
+  renderHome();
+  toast(editId?'Đã cập nhật nhà':'Đã thêm nhà mới','ti-circle-check','var(--up)');
+}
+function deleteHouse(id){
+  if(!confirm('Xóa nhà này sẽ xóa toàn bộ phòng và dữ liệu liên quan. Tiếp tục?')) return;
+  const h = houseById(id);
+  (h?.rooms||[]).forEach(r=>purgeRoomKeys(id, r.id));
+  DB.houses = DB.houses.filter(h=>h.id!==id);
+  saveDB(); closeModal(); showSection('home');
+  toast('Đã xóa nhà','ti-trash','var(--down)');
+}
+
+/* ════════════════════════════════════════
+   ADD/EDIT ROOM
+════════════════════════════════════════ */
+function openAddRoomModal(houseId){ openRoomModal(houseId, null); }
+function openEditRoomModal(houseId, roomId){ openRoomModal(houseId, roomId); }
+function openRoomModal(houseId, roomId){
+  const r = roomId ? roomById(houseId, roomId) : null;
+  const v=(f,d='')=>r?(r[f]??d):d;
+  openModal(`<i class="ti ti-door"></i>${r?'Sửa thông tin phòng':'Thêm phòng mới'}`,`
+    <div class="form-grid">
+
+      <div class="fg full" style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding-bottom:2px;border-bottom:1px solid var(--border2)">Phòng</div>
+      <div class="fg"><label>Số phòng *</label><input type="text" id="r-num" value="${v('number')}" placeholder="VD: P01" required></div>
+      <div class="fg"><label>Trạng thái</label><select id="r-status">
+        ${['Đang thuê','Trống'].map(s=>`<option ${v('status','Đang thuê')===s?'selected':''}>${s}</option>`).join('')}
+      </select></div>
+
+      <div class="fg full" style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding-bottom:2px;border-bottom:1px solid var(--border2);margin-top:4px">Khách thuê</div>
+      <div class="fg"><label>Tên khách thuê</label><input type="text" id="r-name" value="${v('tenantName')}" placeholder="Họ và tên"></div>
+      <div class="fg"><label>Số điện thoại</label><input type="text" id="r-phone" value="${v('phone')}" placeholder="09xx..."></div>
+      <div class="fg"><label>Ngày bắt đầu HĐ</label><input type="date" id="r-start" value="${v('contractStart')}"></div>
+      <div class="fg"><label>Ngày kết thúc HĐ</label><input type="date" id="r-end" value="${v('contractEnd')}"></div>
+
+      <div class="fg full" style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding-bottom:2px;border-bottom:1px solid var(--border2);margin-top:4px">Tài chính</div>
+      <div class="fg"><label>Tiền phòng/tháng (VNĐ)</label><input type="text" inputmode="numeric" id="r-rent" value="${v('rent',0)}"></div>
+      <div class="fg"><label>Tiền nước/tháng (VNĐ)</label><input type="text" inputmode="numeric" id="r-water" value="${v('water',0)}"></div>
+      <div class="fg"><label>Tiền cọc (VNĐ)</label><input type="text" inputmode="numeric" id="r-deposit" value="${v('deposit',0)}"></div>
+      <div class="fg"><label>Trạng thái cọc</label><select id="r-dstatus">
+        ${['Đã thu','Chưa thu','Đã hoàn'].map(s=>`<option ${(v('depositStatus','Chưa thu'))===s?'selected':''}>${s}</option>`).join('')}
+      </select></div>
+      <div class="fg full">
+        <label>Phí khác (internet, dịch vụ, rác...)</label>
+        <div id="r-fees-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
+          ${(v('otherFees',[])).map((f,i)=>`
+            <div class="r-fee-row" style="display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center">
+              <input type="text" class="r-fee-name" placeholder="Tên phí" value="${f.name||''}" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:Quicksand,sans-serif;font-size:13px;font-weight:600;color:var(--text);background:var(--surface2);outline:none;width:100%">
+              <input type="text" inputmode="numeric" class="r-fee-amt" placeholder="Số tiền" value="${f.amount||0}" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:Quicksand,sans-serif;font-size:13px;font-weight:600;color:var(--text);background:var(--surface2);outline:none;width:100%;min-width:110px">
+              <button type="button" onclick="removeFadeRow(this)" style="width:32px;height:32px;border:1.5px solid var(--down-border);background:var(--down-soft);color:var(--down);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px"><i class="ti ti-x"></i></button>
+            </div>`).join('')}
+        </div>
+        <button type="button" onclick="addFeeRow()" class="btn btn-outline btn-sm" style="align-self:flex-start"><i class="ti ti-plus"></i> Thêm phí</button>
+      </div>
+
+      <div class="fg full" style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding-bottom:2px;border-bottom:1px solid var(--border2);margin-top:4px">Khác</div>
+      <div class="fg full"><label>Ghi chú</label><input type="text" id="r-note" value="${v('note')}" placeholder="Ghi chú về phòng hoặc khách"></div>
+    </div>
+    <div class="modal-footer">
+      ${r?`<button class="btn btn-danger" onclick="confirmDeleteRoom('${houseId}','${roomId}')"><i class="ti ti-trash"></i>Xóa phòng</button>`:''}
+      <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="submitRoom('${houseId}',${r?`'${r.id}'`:'null'})"><i class="ti ti-check"></i>${r?'Lưu':'Thêm phòng'}</button>
+    </div>
+  `);
+}
+function addFeeRow(){
+  const list = document.getElementById('r-fees-list');
+  if(!list) return;
+  const row = document.createElement('div');
+  row.className = 'r-fee-row';
+  row.style.cssText = 'display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center';
+  row.innerHTML = `
+    <input type="text" class="r-fee-name" placeholder="Tên phí" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:Quicksand,sans-serif;font-size:13px;font-weight:600;color:var(--text);background:var(--surface2);outline:none;width:100%">
+    <input type="text" inputmode="numeric" class="r-fee-amt" placeholder="Số tiền" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:Quicksand,sans-serif;font-size:13px;font-weight:600;color:var(--text);background:var(--surface2);outline:none;width:100%;min-width:110px">
+    <button type="button" onclick="removeFadeRow(this)" style="width:32px;height:32px;border:1.5px solid var(--down-border);background:var(--down-soft);color:var(--down);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px"><i class="ti ti-x"></i></button>`;
+  list.appendChild(row);
+  // gắn format tiền cho ô mới
+  const amtEl = row.querySelector('.r-fee-amt');
+  if(amtEl) attachMoneyInput(amtEl);
+}
+
+function submitRoom(houseId, roomId){
+  const v=id=>document.getElementById(id)?.value||'';
+  if(!v('r-num').trim()){ toast('Vui lòng nhập số phòng','ti-alert-circle','var(--down)'); return; }
+  // Thu thập phí khác
+  const otherFees = [];
+  document.querySelectorAll('#r-fees-list .r-fee-row').forEach(row=>{
+    const name = row.querySelector('.r-fee-name')?.value.trim();
+    const rawAmt = row.querySelector('.r-fee-amt')?.value||'0';
+    const amount = parseFloat(rawAmt.replace(/\./g,''))||0;
+    if(name) otherFees.push({name, amount});
+  });
+  const entry={number:v('r-num'),status:v('r-status'),tenantName:v('r-name'),phone:v('r-phone'),
+    rent:readNum('r-rent'),water:readNum('r-water'),contractStart:v('r-start'),contractEnd:v('r-end'),
+    deposit:readNum('r-deposit'),depositStatus:v('r-dstatus'),note:v('r-note'),otherFees,
+    electric: roomId ? (roomById(houseId,roomId)?.electric||{prev:0,curr:0,price:3500}) : {prev:0,curr:0,price:3500}};
+  const h = houseById(houseId);
+  if(roomId){ Object.assign(roomById(houseId,roomId),entry); }
+  else { h.rooms = h.rooms||[]; h.rooms.push({id:nextId(),...entry}); }
+  saveDB(); closeModal();
+  if(PANEL_ROOM_ID===roomId && roomId) renderRoomPanel();
+  if(CURRENT_SECTION==='house-detail') renderHouseDetail(houseId);
+  toast(roomId?'Đã cập nhật phòng':'Đã thêm phòng mới','ti-circle-check','var(--up)');
+}
+function confirmDeleteRoom(houseId, roomId){
+  const r = roomById(houseId, roomId);
+  if(!confirm(`Xóa phòng "${r?.number}"? Hành động này không thể hoàn tác, toàn bộ lịch sử thu tiền và điện của phòng này cũng sẽ bị xóa.`)) return;
+  const h = houseById(houseId);
+  h.rooms = h.rooms.filter(x=>x.id!==roomId);
+  purgeRoomKeys(houseId, roomId);
+  saveDB(); closeModal(); closeRoomPanel();
+  if(CURRENT_SECTION==='house-detail') renderHouseDetail(houseId);
+  toast('Đã xóa phòng','ti-trash','var(--down)');
+}
+
+/* ════════════════════════════════════════
+   EDIT ELECTRIC
+════════════════════════════════════════ */
+function openEditElectricModal(houseId, roomId){
+  const r = roomById(houseId, roomId);
+  if(!r) return;
+  const month = thisMonth();
+  const el = r.electric||{prev:0,curr:0,price:3500};
+
+  // Tìm chỉ số cuối kỳ của tháng TRƯỚC từ history (chỉ để gợi ý, không tự điền)
+  const prevMonth = prevMonthOf(month);
+  const prevHistory = DB.electricHistory?.[collectKey(houseId,roomId,prevMonth)];
+  const suggestPrev = prevHistory ? prevHistory.curr : null;
+  // Nếu tháng này đã từng nhập rồi thì điền sẵn để sửa.
+  // Nếu CHƯA nhập tháng này nhưng phòng đã có chỉ số cũ (r.electric.curr) thì fallback về đó —
+  // KHÔNG được để trống, vì để trống sẽ đọc thành 0 và tính sai số kWh nếu người dùng quên nhập đầu kỳ.
+  const thisHistory = DB.electricHistory?.[collectKey(houseId,roomId,month)];
+  const hasRealPrevReading = !thisHistory && (el.curr||0) > 0;
+  const prevVal = thisHistory ? thisHistory.prev : (hasRealPrevReading ? el.curr : '');
+  const currVal = thisHistory ? thisHistory.curr : '';
+
+  openModal(`<i class="ti ti-bolt"></i>Cập nhật chỉ số điện — ${r.number} · ${month}`,`
+    <div class="form-grid">
+      <div class="fg">
+        <label>Chỉ số đầu kỳ</label>
+        <div style="display:flex;gap:6px">
+          <input type="text" inputmode="numeric" id="el-prev" value="${prevVal}" oninput="calcElec()" placeholder="Nhập tay" style="flex:1">
+          ${suggestPrev!=null?`<button type="button" class="btn btn-outline btn-sm" style="white-space:nowrap" onclick="document.getElementById('el-prev').value='${suggestPrev}';calcElec()" title="Lấy chỉ số cuối kỳ tháng trước (${prevMonth}): ${suggestPrev}"><i class="ti ti-arrow-down"></i> Lấy từ tháng trước</button>`:''}
+        </div>
+        ${hasRealPrevReading?`<div style="font-size:11px;color:var(--muted);margin-top:3px;font-weight:600"><i class="ti ti-info-circle" style="font-size:11px"></i> Tự động điền từ chỉ số cuối kỳ gần nhất của phòng (${el.curr}) — kiểm tra lại trước khi lưu</div>`
+          :suggestPrev!=null?`<div style="font-size:11px;color:var(--muted);margin-top:3px;font-weight:600"><i class="ti ti-info-circle" style="font-size:11px"></i> Tháng trước (${prevMonth}) ghi nhận cuối kỳ: ${suggestPrev} — bấm nút để tự điền nếu khớp</div>`:''}
+      </div>
+      <div class="fg">
+        <label>Chỉ số cuối kỳ <span style="font-size:11px;color:var(--accent);font-weight:700">← nhập vào đây</span></label>
+        <input type="text" inputmode="numeric" id="el-curr" value="${currVal}" oninput="calcElec()" placeholder="Đọc từ đồng hồ điện" autofocus>
+      </div>
+      <div class="fg"><label>Đơn giá (đ/kWh)</label><input type="text" inputmode="numeric" id="el-price" value="${el.price||3500}" oninput="calcElec()"></div>
+      <div class="fg"><label>Tiền nước/tháng (VNĐ)</label>
+        <div style="padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text2);font-weight:600;font-size:13px">${fmtVND(r.water||0)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;font-weight:600">Muốn đổi giá nước cố định, vào "Sửa phòng"</div>
+      </div>
+      <div class="fg full"><div id="el-preview" style="background:var(--accent-soft);border:1.5px solid var(--accent-border);border-radius:var(--r);padding:10px 13px;font-size:13px;font-weight:600;color:var(--accent)">Đang tính...</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="submitElectric('${houseId}','${roomId}')"><i class="ti ti-check"></i>Lưu</button>
+    </div>
+  `);
+  setTimeout(calcElec, 50);
+}
+function calcElec(){
+  const prev=+(document.getElementById('el-prev')?.value||'').replace(/\./g,'')||0;
+  const curr=+(document.getElementById('el-curr')?.value||'').replace(/\./g,'')||0;
+  const price=+(document.getElementById('el-price')?.value||'').replace(/\./g,'')||3500;
+  const kwh=Math.max(0,curr-prev);
+  const amt=kwh*price;
+  const el=document.getElementById('el-preview');
+  if(el) el.innerHTML=`Số kWh: <strong>${kwh}</strong> — Tiền điện: <strong>${fmtVND(amt)}</strong>`;
+}
+function submitElectric(houseId, roomId){
+  const r = roomById(houseId, roomId);
+  if(!r) return;
+  const month = thisMonth();
+  const prevVal = readNum('el-prev');
+  const currVal = readNum('el-curr');
+  const priceVal = readNum('el-price')||3500;
+
+  if(!currVal){ toast('Vui lòng nhập chỉ số cuối kỳ','ti-alert-circle','var(--down)'); return; }
+  if(currVal < prevVal){ toast('Chỉ số cuối kỳ phải lớn hơn đầu kỳ','ti-alert-circle','var(--down)'); return; }
+
+  if(!DB.electricHistory) DB.electricHistory={};
+  DB.electricHistory[collectKey(houseId,roomId,month)] = {
+    prev: prevVal, curr: currVal, price: priceVal, water: r.water||0, month, tenant: r.tenantName||''
+  };
+  r.electric = {prev: prevVal, curr: currVal, price: priceVal};
+  saveDB(); closeModal();
+  if(PANEL_ROOM_ID===roomId) renderRoomPanel();
+  if(CURRENT_SECTION==='house-detail') renderDetailTab(houseId);
+  toast('Đã cập nhật chỉ số điện','ti-circle-check','var(--up)','Đi thu tiền','showSection(&quot;collect&quot;)');
+}
+
+/* ════════════════════════════════════════
+   NHẬP ĐIỆN THEO LÔ CHO CẢ NHÀ
+════════════════════════════════════════ */
+function openBulkElectricModal(houseId){
+  const h = houseById(houseId);
+  if(!h) return;
+  const month = thisMonth();
+  const prevMonth = prevMonthOf(month);
+  const active = [...(h.rooms||[])].sort(naturalSort).filter(r=>r.status!=='Trống');
+  if(!active.length){ toast('Nhà này chưa có phòng đang thuê','ti-alert-circle','var(--warn)'); return; }
+
+  const rows = active.map(r=>{
+    const el = r.electric||{prev:0,curr:0,price:3500};
+    const prevHistory = DB.electricHistory?.[collectKey(houseId,r.id,prevMonth)];
+    const suggestPrev = prevHistory ? prevHistory.curr : null;
+    const thisHistory = DB.electricHistory?.[collectKey(houseId,r.id,month)];
+    const hasRealPrevReading = !thisHistory && (el.curr||0) > 0;
+    const prevVal = thisHistory ? thisHistory.prev : (hasRealPrevReading ? el.curr : '');
+    const currVal = thisHistory ? thisHistory.curr : '';
+    return `<div class="be-row">
+      <div class="be-room"><strong>${r.number}</strong><span>${r.tenantName||'—'}</span></div>
+      <div class="be-prev" style="display:flex;align-items:center;gap:5px">
+        <input type="text" inputmode="numeric" id="bulk-prev-${r.id}" value="${prevVal}" class="table-input" style="width:70px" placeholder="Đầu kỳ">
+        ${suggestPrev!=null?`<button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px;white-space:nowrap" onclick="document.getElementById('bulk-prev-${r.id}').value='${suggestPrev}'" title="Lấy chỉ số cuối kỳ tháng trước (${prevMonth}): ${suggestPrev}"><i class="ti ti-arrow-down"></i> T.trước</button>`:''}
+      </div>
+      <div class="be-input-wrap"><input type="text" inputmode="numeric" id="bulk-el-${r.id}" value="${currVal}" class="table-input"
+        data-price="${el.price||3500}" placeholder="Chỉ số mới"></div>
+    </div>`;
+  }).join('');
+
+  openModal(`<i class="ti ti-bolt"></i>Nhập chỉ số điện — ${h.name} · ${month}`,`
+    <div>${rows}</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="submitBulkElectric('${houseId}')"><i class="ti ti-check"></i>Lưu tất cả</button>
+    </div>
+  `);
+}
+function submitBulkElectric(houseId){
+  const h = houseById(houseId);
+  if(!h) return;
+  const month = thisMonth();
+  const active = (h.rooms||[]).filter(r=>r.status!=='Trống');
+  let savedCount=0, invalidCount=0;
+  if(!DB.electricHistory) DB.electricHistory={};
+  active.forEach(r=>{
+    const input = document.getElementById('bulk-el-'+r.id);
+    if(!input || !input.value.trim()) return;
+    const currVal = parseFloat(input.value.replace(/\./g,'')) || 0;
+    const prevInput = document.getElementById('bulk-prev-'+r.id);
+    const prevVal = parseFloat((prevInput?.value||'').replace(/\./g,'')) || 0;
+    const priceVal = parseFloat(input.dataset.price) || 3500;
+    if(currVal < prevVal){ invalidCount++; return; }
+    DB.electricHistory[collectKey(houseId,r.id,month)] = {
+      prev: prevVal, curr: currVal, price: priceVal, water: r.water||0, month, tenant: r.tenantName||''
+    };
+    r.electric = {prev: prevVal, curr: currVal, price: priceVal};
+    savedCount++;
+  });
+  saveDB(); closeModal();
+  if(CURRENT_SECTION==='house-detail') renderDetailTab(houseId);
+  if(savedCount===0 && invalidCount===0){ toast('Chưa có phòng nào được nhập chỉ số mới','ti-alert-circle','var(--warn)'); return; }
+  if(invalidCount>0){
+    toast(`Đã lưu ${savedCount} phòng, ${invalidCount} phòng bị bỏ qua do chỉ số không hợp lệ`,'ti-alert-circle','var(--warn)','Đi thu tiền','showSection(&quot;collect&quot;)');
+  } else {
+    toast(`Đã cập nhật điện cho ${savedCount} phòng`,'ti-circle-check','var(--up)','Đi thu tiền','showSection(&quot;collect&quot;)');
+  }
+}
+
+/* ════════════════════════════════════════
+   BILL TABLE — Xem bill cả nhà (chỉ xem, không sửa)
+════════════════════════════════════════ */
+function openBillTableModal(houseId){
+  const h = houseById(houseId);
+  if(!h) return;
+  const month = thisMonth();
+  const active = [...(h.rooms||[])].sort(naturalSort).filter(r=>r.status!=='Trống');
+  if(!active.length){ toast('Nhà này chưa có phòng đang thuê','ti-alert-circle','var(--warn)'); return; }
+
+  let sumKwh=0, sumTotal=0;
+  const rows = active.map(r=>{
+    const bill = calcRoomBill(h.id, r);
+    const hasElecData = bill.hasElecData;
+    const feeLines = [`Phòng: ${fmtVND(bill.rent)}`, `Nước: ${fmtVND(bill.water)}`, ...(bill.otherFees||[]).map(f=>`${f.name}: ${fmtVND(f.amount)}`)];
+    sumKwh+=bill.kwh; sumTotal+=bill.total;
+    return `<tr>
+      <td><strong>${r.number}</strong><div style="font-size:11px;color:var(--muted)">${r.tenantName||'—'}</div></td>
+      <td style="font-size:12px;color:var(--text2)">${hasElecData?`${bill.prev||0} → ${bill.curr||0}<div class="bt-kwh">${bill.kwh} kWh · ${fmtVND(bill.elec)}</div>`:'<span class="bt-empty">Chưa nhập</span>'}</td>
+      <td style="font-size:11px;color:var(--muted);font-weight:600;line-height:1.5">${feeLines.join('<br>')}</td>
+      <td><strong style="color:var(--accent)">${fmtVND(bill.total)}</strong></td>
+    </tr>`;
+  }).join('');
+
+  openModal(`<i class="ti ti-eye"></i>Xem bill cả nhà — ${h.name} · ${month}`,`
+    <div class="bt-wrap">
+      <table class="bt-table">
+        <thead><tr>
+          <th>Phòng</th>
+          <th>Điện (đầu→cuối)</th>
+          <th>Các khoản phí</th>
+          <th>Tổng bill</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr>
+          <td colspan="2" style="color:var(--accent)">Tổng toàn nhà · ${sumKwh} kWh</td>
+          <td></td>
+          <td><strong style="color:var(--up)">${fmtVND(sumTotal)}</strong></td>
+        </tr></tfoot>
+      </table>
+    </div>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:8px;font-weight:600"><i class="ti ti-info-circle"></i> Đây là bảng chỉ xem, không thể chỉnh sửa. Muốn cập nhật chỉ số điện, dùng nút "Nhập điện cả nhà" hoặc bấm vào từng phòng.</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Đóng</button>
+    </div>
+  `);
+}
+
+/* ════════════════════════════════════════
+   EXPORT / IMPORT
+════════════════════════════════════════ */
+function exportData(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='domos-backup-'+todayStr()+'.json'; a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem('domos_last_backup', Date.now().toString());
+  localStorage.removeItem('domos_banner_dismissed_today');
+  toast('Đã backup! Lưu file vào Google Drive/email để an toàn.','ti-download','var(--up)');
+  updateBackupStatus();
+}
+function getLastBackupInfo(){
+  const ts=parseInt(localStorage.getItem('domos_last_backup')||'0');
+  if(!ts) return {days:null,label:'Chưa từng backup'};
+  const days=Math.floor((Date.now()-ts)/(1000*60*60*24));
+  const d=new Date(ts);
+  const label=d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
+  return {days,label,ts};
+}
+function updateBackupStatus(){
+  const info=getLastBackupInfo();
+  const dot=document.getElementById('backup-dot');
+  const banner=document.getElementById('backup-banner');
+  const bannerMsg=document.getElementById('backup-banner-msg');
+  const btn=document.getElementById('backup-btn');
+  if(btn){
+    if(info.days===null) btn.title='Chưa từng backup — bấm để xuất file ngay!';
+    else if(info.days===0) btn.title='Backup hôm nay ('+info.label+')';
+    else btn.title='Backup lần cuối: '+info.label+' ('+info.days+' ngày trước)';
+  }
+  const needWarn=info.days===null||info.days>=7;
+  if(dot){ dot.style.opacity = needWarn?'1':'0'; dot.style.transform = needWarn?'scale(1)':'scale(0)'; }
+  const dismissed=localStorage.getItem('domos_banner_dismissed_today');
+  if(dismissed===todayStr()&&info.days!==null&&info.days<14){if(banner)banner.style.display='none';return;}
+  if(needWarn&&banner&&bannerMsg){
+    if(info.days===null){bannerMsg.textContent='Bạn chưa từng backup dữ liệu! Nếu xóa cache trình duyệt, toàn bộ dữ liệu sẽ biến mất. Hãy xuất file và lưu vào Google Drive/email ngay.';}
+    else{bannerMsg.textContent='Backup lần cuối: '+info.label+' ('+info.days+' ngày trước). Nên backup mỗi tuần để tránh mất dữ liệu!';}
+    if(banner.style.display==='none'||!banner.style.display){
+      banner.style.maxHeight='0px';
+      banner.style.display='flex'; banner.classList.add('banner-hide');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        banner.classList.remove('banner-hide');
+        banner.style.maxHeight = banner.scrollHeight+'px';
+      }));
+    } else {
+      banner.classList.remove('banner-hide');
+      banner.style.maxHeight = banner.scrollHeight+'px';
+    }
+  } else if(banner && banner.style.display!=='none'){
+    banner.classList.add('banner-hide');
+    banner.style.maxHeight = '0px';
+    setTimeout(()=>{ banner.style.display='none'; }, 462);
+  }
+}
+function dismissBackupBanner(){
+  localStorage.setItem('domos_banner_dismissed_today',todayStr());
+  const b=document.getElementById('backup-banner');
+  if(b){ b.classList.add('banner-hide'); b.style.maxHeight='0px'; setTimeout(()=>{ b.style.display='none'; }, 462); }
+}
+function importData(inp){
+  const file=inp.files&&inp.files[0]; if(!file) return;
+  if(!confirm('Nhập file này sẽ THAY THẾ TOÀN BỘ dữ liệu hiện tại trên máy này (không thể hoàn tác). Nếu chưa backup dữ liệu hiện tại, hãy bấm Hủy và xuất file backup trước. Tiếp tục nhập file?')){ inp.value=''; return; }
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const p=JSON.parse(ev.target.result);
+      if(!p||!Array.isArray(p.houses)) throw new Error('Invalid');
+      DB=p;
+      // migrate: đảm bảo field mới luôn tồn tại, giống loadDB() — tránh thiếu field khi import file backup cũ
+      if(!DB.collectStatus) DB.collectStatus={};
+      if(!DB.collectHistory) DB.collectHistory={};
+      if(!DB.electricHistory) DB.electricHistory={};
+      if(!DB.maintenance) DB.maintenance=[];
+      saveDB(); showSection('home');
+      toast('Đã nhập dữ liệu thành công','ti-circle-check','var(--up)');
+      updateBackupStatus();
+    }catch(e){ toast('File không hợp lệ','ti-alert-triangle','var(--down)'); }
+  };
+  reader.readAsText(file); inp.value='';
+}
+
+/* ════════════════════════════════════════
+   HISTORY — Lịch sử thu tiền & điện
+════════════════════════════════════════ */
+function onElecMonthChange(val){
+  ELEC_HISTORY_MONTH = val;
+  renderHistory();
+}
+
+function renderElectric(){
+  const el = document.getElementById('electric-content');
+  if(!el) return;
+  if(!DB.houses.length){
+    el.innerHTML=`<div class="empty"><i class="ti ti-building-warehouse"></i><h3>Chưa có nhà nào</h3><p>Thêm nhà trước để nhập chỉ số điện</p></div>`;
+    return;
+  }
+  fadeSwap(el, DB.houses.map(h=>{
+    const active = (h.rooms||[]).filter(r=>r.status!=='Trống');
+    const month = thisMonth();
+    const entered = active.filter(r=>!!DB.electricHistory?.[collectKey(h.id,r.id,month)]).length;
+    const pct = active.length ? Math.round(entered/active.length*100) : 0;
+    const barColor = pct===100?'var(--up)':pct>50?'var(--accent)':'var(--warn)';
+    return `<div class="card" style="margin-bottom:1rem">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-building-warehouse"></i>${h.name}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="openBulkElectricModal('${h.id}')"><i class="ti ti-bolt"></i> Nhập điện cả nhà</button>
+          <button class="btn btn-outline btn-sm" onclick="openBillTableModal('${h.id}')"><i class="ti ti-eye"></i> Xem bill cả nhà</button>
+        </div>
+      </div>
+      <div style="padding:0 1.2rem 1rem">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">Tháng ${month} · Đã nhập ${entered}/${active.length} phòng</div>
+        <div style="height:6px;background:var(--border2);border-radius:10px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:10px"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join(''));
+}
+
+function renderHistory(){
+  const el = document.getElementById('history-content');
+  if(!el) return;
+
+  // Thu thập tất cả tháng có data
+  const allMonths = new Set();
+  Object.keys(DB.collectStatus||{}).forEach(k=>{ const m=k.split('_').pop(); if(/^\d{4}-\d{2}$/.test(m)) allMonths.add(m); });
+  Object.keys(DB.electricHistory||{}).forEach(k=>{ const m=k.split('_').pop(); if(/^\d{4}-\d{2}$/.test(m)) allMonths.add(m); });
+  const months = [...allMonths].sort().reverse();
+
+  if(!months.length && !DB.houses.length){
+    el.innerHTML=`<div class="empty"><i class="ti ti-history"></i><h3>Chưa có lịch sử</h3><p>Lịch sử thu tiền và điện sẽ tự động được lưu khi bạn sử dụng</p></div>`;
+    return;
+  }
+
+  // --- Lịch sử thu tiền ---
+  const collectRows = [];
+  const seenMonths = new Set();
+  seenMonths.add(thisMonth());
+  months.forEach(m=>seenMonths.add(m));
+  const sortedMonths = [...seenMonths].sort().reverse().slice(0,12);
+
+  sortedMonths.forEach(month=>{
+    let totalAmt=0, cntC=0, cntP=0, cntO=0, cntTotal=0;
+    DB.houses.forEach(h=>{
+      (h.rooms||[]).forEach(r=>{
+        const st = DB.collectStatus[collectKey(h.id,r.id,month)];
+        if(!st) return; // phòng không có dữ liệu thu tiền tháng này thì bỏ qua, không phụ thuộc trạng thái hiện tại
+        cntTotal++;
+        const amt = DB.collectHistory?.[collectKey(h.id,r.id,month)] || 0;
+        if(st==='Đã thu'){cntC++; totalAmt+=amt;}
+        else if(st==='Quá hạn') cntO++;
+        else cntP++;
+      });
+    });
+    if(!cntTotal) return;
+    const pct = cntTotal ? Math.round(cntC/cntTotal*100) : 0;
+    const barColor = pct===100?'var(--up)':pct>60?'var(--accent)':'var(--warn)';
+    const isCurrent = month===thisMonth();
+    collectRows.push(`<tr${isCurrent?' style="background:var(--accent-soft)"':''}>
+      <td><strong>${month}</strong>${isCurrent?' <span class="badge badge-accent" style="font-size:10px">Tháng này</span>':''}${pct===100?' <span class="badge badge-up" style="font-size:10px">Đã đóng sổ</span>':''}</td>
+      <td><strong style="color:var(--up)">${fmtVND(totalAmt)}</strong></td>
+      <td>${cntC}/${cntTotal} phòng
+        <div style="height:5px;background:var(--border2);border-radius:3px;margin-top:4px;width:80px">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:3px"></div>
+        </div>
+      </td>
+      <td>${cntP>0?`<span class="badge badge-warn">${cntP} chưa thu</span>`:''}</td>
+      <td>${cntO>0?`<span class="badge badge-down">${cntO} nợ</span>`:''}</td>
+    </tr>`);
+  });
+
+  // --- Lịch sử điện: tập hợp tháng có data điện ---
+  const elecMonthSet = new Set();
+  elecMonthSet.add(thisMonth());
+  Object.keys(DB.electricHistory||{}).forEach(k=>{ const m=k.split('_').pop(); if(/^\d{4}-\d{2}$/.test(m)) elecMonthSet.add(m); });
+  const elecMonthList = [...elecMonthSet].sort().reverse();
+
+  // Chọn tháng mặc định
+  if(!ELEC_HISTORY_MONTH || !elecMonthSet.has(ELEC_HISTORY_MONTH)) ELEC_HISTORY_MONTH = elecMonthList[0] || thisMonth();
+  const selMonth = ELEC_HISTORY_MONTH;
+
+  // Tháng liền trước để so sánh ▲▼
+  const prevMonth = prevMonthOf(selMonth);
+
+  // Xây bảng tổng hợp tất cả phòng trong tháng được chọn
+  let totalKwh=0, totalElecAmt=0;
+  const elecRows = [];
+  DB.houses.forEach(h=>{
+    (h.rooms||[]).sort(naturalSort).forEach(r=>{
+      const key = collectKey(h.id, r.id, selMonth);
+      const data = DB.electricHistory?.[key];
+      const prevData = DB.electricHistory?.[collectKey(h.id, r.id, prevMonth)];
+
+      if(!data){
+        // Phòng không có data tháng này — hiển thị dòng mờ "Chưa nhập"
+        if(r.status==='Trống') return; // phòng trống bỏ qua hoàn toàn
+        elecRows.push(`<tr style="opacity:.45">
+          <td>${h.name}</td>
+          <td>${r.number}</td>
+          <td style="color:var(--muted)">${r.tenantName||'—'}</td>
+          <td colspan="5" style="color:var(--muted);font-style:italic">Chưa nhập chỉ số điện tháng này</td>
+        </tr>`);
+        return;
+      }
+
+      const kwh = Math.max(0,(data.curr||0)-(data.prev||0));
+      const elecAmt = kwh*(data.price||3500);
+      totalKwh += kwh; totalElecAmt += elecAmt;
+
+      // So sánh ▲▼ với tháng trước
+      let diffTag='';
+      if(prevData){
+        const prevKwh = Math.max(0,(prevData.curr||0)-(prevData.prev||0));
+        const diff = kwh - prevKwh;
+        if(Math.abs(diff)>5) diffTag=`<span style="font-size:10px;color:${diff>0?'var(--down)':'var(--up)'};font-weight:700;margin-left:5px">${diff>0?'▲':'▼'}${Math.abs(diff)} kWh</span>`;
+      }
+
+      elecRows.push(`<tr>
+        <td style="color:var(--text2);font-size:12.5px">${h.name}</td>
+        <td><strong>${r.number}</strong></td>
+        <td>${data.tenant || r.tenantName || '—'}</td>
+        <td style="font-size:12.5px;color:var(--muted)">${data.prev||0}</td>
+        <td><strong>${data.curr||0}</strong></td>
+        <td><strong>${kwh}</strong>${diffTag}</td>
+        <td><strong style="color:var(--accent)">${fmtVND(elecAmt)}</strong></td>
+      </tr>`);
+    });
+  });
+
+  const monthOptions = elecMonthList.map(m=>`<option value="${m}" ${m===selMonth?'selected':''}>${m}${m===thisMonth()?' (tháng này)':''}</option>`).join('');
+
+  const elecSection = `
+    <div class="sec-hd" style="margin-bottom:1rem">
+      <div><div class="sec-title" style="font-size:15px">Lịch sử chỉ số điện</div><div class="sec-sub">Tổng hợp tất cả phòng theo tháng</div></div>
+      <select onchange="onElecMonthChange(this.value)" style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;border:1.5px solid var(--border);border-radius:var(--r);padding:7px 11px;background:var(--surface);outline:none;color:var(--text);cursor:pointer">
+        ${monthOptions}
+      </select>
+    </div>
+    ${elecRows.length ? `
+    <div class="card">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Nhà</th><th>Phòng</th><th>Khách thuê</th>
+          <th>Đầu kỳ</th><th>Cuối kỳ</th><th>Số kWh</th><th>Tiền điện</th>
+        </tr></thead>
+        <tbody>${elecRows.join('')}</tbody>
+        <tfoot><tr>
+          <td colspan="5" style="color:var(--accent);font-weight:700">Tổng tháng ${selMonth}</td>
+          <td><strong>${totalKwh} kWh</strong></td>
+          <td><strong style="color:var(--up)">${fmtVND(totalElecAmt)}</strong></td>
+        </tr></tfoot>
+      </table></div>
+    </div>` : `<div class="empty"><i class="ti ti-bolt"></i><h3>Chưa có lịch sử điện</h3><p>Lịch sử sẽ tự động lưu khi bạn cập nhật chỉ số điện hàng tháng</p></div>`}
+  `;
+
+  fadeSwap(el, `
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-coin"></i>Lịch sử thu tiền (12 tháng gần nhất)</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tháng</th><th>Đã thu</th><th>Tỷ lệ thu</th><th>Chưa thu</th><th>Quá hạn</th></tr></thead>
+          <tbody>${collectRows.join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Chưa có dữ liệu thu tiền</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+    ${elecSection}
+  `);
+}
+
+/* ════════════════════════════════════════
+   BADGES & INIT
+════════════════════════════════════════ */
+function updateBadges(){
+  // badge-houses đã bỏ khỏi sidebar
+  const pending = (DB.maintenance||[]).filter(m=>m.status!=='Đã xong').length;
+  const mb = document.getElementById('badge-maint');
+  mb.textContent = pending;
+  mb.style.opacity = pending>0 ? '1' : '0';
+  mb.style.transform = pending>0 ? 'scale(1)' : 'scale(0)';
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('backup-banner').style.display='none';
+  renderHome();
+  updateBadges();
+  renderAdminBar();
+  updateBackupStatus();
+});
+</script>
+</body>
+</html>
