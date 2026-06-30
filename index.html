@@ -2576,6 +2576,16 @@ function updateBackupStatus(){
     setTimeout(()=>{ banner.style.display='none'; }, 462);
   }
 }
+function autoBackupIfNeeded(){
+  const info=getLastBackupInfo();
+  const needed = info.days===null || info.days>=7;
+  if(!needed) return;
+  const already=localStorage.getItem('domos_auto_backup_today');
+  if(already===todayStr()) return;
+  exportData();
+  localStorage.setItem('domos_auto_backup_today', todayStr());
+  toast('App vừa tự động backup dữ liệu cho bạn (file đã lưu vào Downloads).','ti-shield-check','var(--up)');
+}
 function dismissBackupBanner(){
   localStorage.setItem('domos_banner_dismissed_today',todayStr());
   const b=document.getElementById('backup-banner');
@@ -2812,6 +2822,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   updateBadges();
   renderAdminBar();
   updateBackupStatus();
+  autoBackupIfNeeded();
 });
 </script>
 </body>
