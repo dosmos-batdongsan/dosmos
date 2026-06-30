@@ -634,11 +634,13 @@ tfoot tr:hover td{background:var(--accent-soft) !important}
     </header>
 
     <!-- Backup warning banner -->
-    <div id="backup-banner" style="display:flex;align-items:center;gap:10px;background:#FEF3C7;border-bottom:1px solid #FDE68A;padding:10px 20px;font-size:13px;color:#92400E;font-weight:700">
+    <div id="backup-banner" style="display:flex;align-items:center;gap:10px;background:#FEF3C7;border-bottom:1px solid #FDE68A;padding:10px 20px;font-size:13px;color:#92400E;font-weight:700;flex-wrap:wrap">
       <i class="ti ti-alert-triangle" style="font-size:18px;color:#D97706;flex-shrink:0"></i>
-      <span id="backup-banner-msg"></span>
-      <button onclick="exportData()" style="margin-left:auto;background:#D97706;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;white-space:nowrap"><i class="ti ti-download"></i> Backup ngay</button>
-      <button onclick="dismissBackupBanner()" style="background:none;border:none;cursor:pointer;color:#92400E;font-size:18px;padding:0 4px" title="Bỏ qua hôm nay"><i class="ti ti-x"></i></button>
+      <span id="backup-banner-msg" style="flex:1 1 280px;min-width:0;line-height:1.5"></span>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+        <button onclick="exportData()" style="background:#D97706;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;white-space:nowrap"><i class="ti ti-download"></i> Backup ngay</button>
+        <button onclick="dismissBackupBanner()" style="background:none;border:none;cursor:pointer;color:#92400E;font-size:18px;padding:0 4px;flex-shrink:0" title="Bỏ qua hôm nay"><i class="ti ti-x"></i></button>
+      </div>
     </div>
 
     <div class="content">
